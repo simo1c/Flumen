@@ -1,0 +1,40 @@
+Package: flumen
+Type: Package
+Title: An R Workflow Manager for Distributed Bioinformatics without Centralized Storage
+Version: 1.0.0
+Authors@R: person("Simone", "Caligola", email = "s.caligola@gmail.com", role = c("aut", "cre"))
+Description: Workflow manager for data pipelines with streaming execution,
+    locality-aware scheduling, cross-machine distribution via TCP, and polyglot
+    operations ('R', 'Python', shell). Uses 'Arrow' IPC for data transfer and 'NNG'
+    sockets for low-latency messaging.
+License: MIT + file LICENSE
+URL: https://github.com/simo1c/Flumen
+BugReports: https://github.com/simo1c/Flumen/issues
+Encoding: UTF-8
+LazyData: false
+Depends: R (>= 4.0)
+Imports:
+    Rcpp,
+    nanonext,
+    arrow,
+    qs2,
+    igraph,
+    sys,
+    uuid,
+    rlang,
+    methods,
+    tools,
+    stats,
+    utils
+LinkingTo: Rcpp
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    bit64,
+    jsonlite
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+SystemRequirements: Python 3.9+ with pyarrow, pandas, numpy and pynng (optional, for Python ops)
+RoxygenNote: 7.3.3
+Roxygen: list(markdown = TRUE)

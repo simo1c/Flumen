@@ -1,0 +1,19 @@
+# compiled code: rebuilt on install, and platform-specific
+src/*.o
+src/*.so
+src/*.dll
+
+# R session and system files
+.Rhistory
+.RData
+.Rproj.user/
+.DS_Store
+
+# R CMD check / build output
+*.Rcheck/
+flumen_*.tar.gz
+
+# left in the working directory by test runs
+log_*/
+central_scheduler_task_table_log.tsv
+*.socket
