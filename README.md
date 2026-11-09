@@ -83,10 +83,6 @@ run_workflow(
 This writes `test.Rds` in the working directory, holding
 `"processed s1; processed s2; processed s3"`.
 
-Only the workflow and the worker list are required. Everything else has
-a default, including `chunk_size`, the largest amount of data sent in
-one message, which is 100 MB.
-
 ## Documentation
 
 ``` r
