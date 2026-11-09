@@ -3,8 +3,8 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 RawVector slice_raw(RawVector x, double start, double end) {
-  // start and end are 1-based, as in R, and double so a payload above 2.1 GB
-  // still indexes. The bounds check turns invalid input (NA/NaN/Inf, an index
+  // start and end are 1-based, as in R.
+  // The bounds check turns invalid input (NA/NaN/Inf, an index
   // out of range, end < start) into a diagnosable R error instead of a segfault.
   if (!R_FINITE(start) || !R_FINITE(end)) {
     Rcpp::stop("slice_raw(): 'start' and 'end' must be finite (got start=%g, end=%g)",
