@@ -34,7 +34,7 @@ stops the task before your code runs.
 ## Quick start
 
 A workflow expands over a set of values, runs one task instance per
-value, and gathers the results back into a single task.
+value, and aggregates the results back into a single task.
 
 ``` r
 library(flumen)
