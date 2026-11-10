@@ -85,7 +85,7 @@ This writes `test.Rds` in the working directory, containing
 - [Getting started](docs/getting-started.md): basic concepts to start with Flumen.
 - [A multi-language pipeline](docs/scrnaseq-annotation.md): a scRNA-seq 
   pipeline across three machines with no shared filesystem.
-- [`FLUMEN_DSL.md`](docs/FLUMEN_DSL.md): the complete reference and an 
+- [Flumen DSL](docs/FLUMEN_DSL.md): the complete reference and an 
   LLM-friendly resource for automatic workflow construction.
 
 
