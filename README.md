@@ -17,7 +17,7 @@ run time where a task discovers them.<br clear="right"/>
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("simo1c/Flumen", build_vignettes = TRUE)
+remotes::install_github("simo1c/Flumen")
 ```
 
 Installing from source compiles a small amount of C++, so a compiler is
