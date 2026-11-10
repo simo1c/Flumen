@@ -80,7 +80,7 @@ run_workflow(
 )
 ```
 
-This writes `test.Rds` in the working directory, holding
+This writes `test.Rds` in the working directory, containing
 `"processed s1; processed s2; processed s3"`.
 
 ## Documentation
