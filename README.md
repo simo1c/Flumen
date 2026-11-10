@@ -94,11 +94,6 @@ This writes `test.Rds` in the working directory, holding
 
 ## Citation
 
-If you use Flumen in published work, please cite:
-
-> Caligola S. et al. Flumen: an R workflow manager for distributed
-> bioinformatics without centralized storage. Manuscript in preparation.
-
 This entry will be replaced by the published reference and its DOI.
 
 ## License
