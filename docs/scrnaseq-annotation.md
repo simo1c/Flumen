@@ -1,39 +1,6 @@
----
-title: "A multi-language scRNA-seq pipeline with Flumen"
-output:
-  rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 3
-vignette: >
-  %\VignetteIndexEntry{A multi-language scRNA-seq pipeline with Flumen}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options:
-  markdown:
-    wrap: 72
----
+# A multi-language scRNA-seq pipeline with Flumen
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  eval     = FALSE,
-  collapse = TRUE,
-  comment  = "#>"
-)
-```
-
-```{=html}
-<style type="text/css">
-h1.title { font-size: 1.5em; padding-right: 137px; }
-h1 { font-size: 1.35em; }
-h2 { font-size: 1.15em; }
-h3 { font-size: 1.0em; }
-h4 { font-size: 0.95em; }
-p, li { text-align: justify; }
-.dag-fig { display: block; margin: 1em auto; width: 55%; border: 0; padding: 0; background: none; box-shadow: none; }
-</style>
-```
-
-This vignette shows a scRNA-seq workflow that spans shell, R, and Python
+This guide shows a scRNA-seq workflow that spans shell, R, and Python
 across three machines (two Linux workstations and a Mac) with no shared
 filesystem. The biology is cell-type annotation of whole blood from six
 patients with mild COVID-19 (Bost *et al.* 2021, 10x 3' v3.1, GEO
@@ -63,7 +30,7 @@ carry. The two `integrate` outputs cross disk-to-disk to the Mac.
 One wildcard, six values. Every task that mentions `{sample}` expands
 into six instances.
 
-```{r}
+```r
 library(flumen)
 
 w_list <- new_wildcard_list(
@@ -85,7 +52,7 @@ consumer is wasted work in the delivery path.
 `filtered_feature_bc_matrix/` is not known when the workflow is built,
 so the pattern is matched against what the task actually produced.
 
-```{r}
+```r
 op_count <- new_shell_task(
   task_id = "count",
   input = new_input(
@@ -121,7 +88,7 @@ The task returns a Seurat object, declared as `new_object("{{seu}}")`.
 It is never written to disk: Flumen keeps it in the producing worker's
 memory and sends it to the consumer that asks for it.
 
-```{r}
+```r
 op_preprocess <- new_R_task(
   task_id = "preprocess",
   input = new_input(
@@ -184,7 +151,7 @@ The two patterns live in **different directories**. `annotate_input/{{e}}`
 is dynamic and claims everything in its directory, so a fourth file
 written there would be collected along with the 10x triplet.
 
-```{r}
+```r
 op_integrate <- new_R_task(
   task_id = "integrate",
   input = new_input(
@@ -262,7 +229,7 @@ changing, and each such edit would otherwise cost a run of this
 pipeline. The csv carries the UMAP coordinates beside the labels, so it
 stands alone and a figure can be drawn directly from it.
 
-```{r}
+```r
 op_annotate <- new_python_task(
   task_id = "annotate",
   input = new_input(
@@ -334,7 +301,7 @@ op_annotate <- new_python_task(
 dependencies, inconsistent wildcards and mixed output kinds become
 build-time errors rather than mid-run failures.
 
-```{r}
+```r
 workflow <- new_workflow(
   workflow_id   = "scrnaseq_blood_annotation",
   desc          = "Whole blood: Cell Ranger -> Seurat CCA -> CellTypist",
@@ -355,7 +322,7 @@ it requires.
 `--localmem=56` per Cell Ranger, the 64 GB machine receives one slot and the
 128 GB machine two.
 
-```{r}
+```r
 worker_list <- list(
   new_worker(
     name              = "mac",
@@ -391,7 +358,7 @@ worker_list <- list(
 `master_host` is the address the workers dial back, so it must be
 reachable from them.
 
-```{r}
+```r
 run_workflow(
   workflow,
   worker_list = worker_list,
@@ -404,7 +371,7 @@ While a long run proceeds, `flumen_status()` prints one row per task
 instance with its worker and state, which is convenient for checking
 progress without reading the logs.
 
-```{r}
+```r
 flumen_status()
 ```
 
@@ -435,9 +402,9 @@ outputs, or run elsewhere.
 
 # Where to go next
 
--   *Getting started*, the building blocks, the `{x}` / `{{x}}` rules,
-    and resource pinning (`requires` / `resources`).
--   `docs/FLUMEN_DSL.md` in the source repository, the exhaustive
-    reference.
+-   [Getting started](getting-started.md), the building blocks, the
+    `{x}` / `{{x}}` rules, and resource pinning (`requires` /
+    `resources`).
+-   [`FLUMEN_DSL.md`](FLUMEN_DSL.md), the exhaustive reference.
 -   `?new_shell_task`, `?new_R_task`, `?new_python_task`, `?new_dep`,
     `?new_file_aggr`, `?pre_staged`, `?ssh_launcher`, `?run_workflow`.

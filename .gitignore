@@ -12,7 +12,6 @@ src/*.dll
 # R CMD check / build output
 *.Rcheck/
 flumen_*.tar.gz
-inst/doc/
 
 # left in the working directory by a workflow run
 log/

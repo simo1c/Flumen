@@ -1,46 +1,11 @@
----
-title: "Getting Started with Flumen"
-output:
-  rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 3
-vignette: >
-  %\VignetteIndexEntry{Getting Started with Flumen}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  eval     = FALSE,         # examples are illustrative; nothing runs at build time
-  collapse = TRUE,
-  comment  = "#>"
-)
-```
-
-```{=html}
-<style type="text/css">
-h1.title { font-size: 1.5em; padding-right: 137px; }
-h1 { font-size: 1.35em; }
-h2 { font-size: 1.15em; }
-h3 { font-size: 1.0em; }
-h4 { font-size: 0.95em; }
-p, li { text-align: justify; }
-table th { text-align: center; }
-table td { text-align: left; }
-table td[align="center"] { text-align: center; }
-</style>
-```
+# Getting Started with Flumen
 
 This is a practical guide for writing and running `flumen` workflows. It
 covers the building blocks and the main rules. For a full worked
-pipeline, see the *A multi-language scRNA-seq pipeline with Flumen*
-vignette. For a complete reference, see `docs/FLUMEN_DSL.md` in the
-source repository, which is also an LLM-friendly resource for automatic
-workflow construction.
+pipeline, see [A multi-language scRNA-seq pipeline with
+Flumen](scrnaseq-annotation.md). For a complete reference, see
+[`FLUMEN_DSL.md`](FLUMEN_DSL.md), which is also an LLM-friendly resource
+for automatic workflow construction.
 
 # 1. What is Flumen?
 
@@ -77,7 +42,7 @@ Flumen is useful when:
 
 ## Installation
 
-```{r}
+```r
 # install.packages("remotes")
 remotes::install_github("simo1c/Flumen")
 ```
@@ -89,7 +54,7 @@ R dependencies install automatically from CRAN (`nanonext`, `arrow`,
 `qs2`, `igraph`, `sys`, `uuid`, `rlang`, `Rcpp`). For Python tasks,
 every worker that runs them needs an interpreter with:
 
-```{bash}
+```bash
 pip3 install pyarrow pandas numpy pynng
 ```
 
@@ -121,7 +86,7 @@ The workflow is executed with
 
 A small end-to-end workflow:
 
-```{r}
+```r
 library(flumen)
 
 w_list <- new_wildcard_list(sample = c("s1", "s2", "s3"))
@@ -185,7 +150,7 @@ substituted at build time from `new_wildcard_list`, while dynamic
 
 Examples of correct use of wildcards:
 
-```{r}
+```r
 new_object_exp("{sample}")               # bind this input to each value of the `sample` wildcard
 new_file_exp("fastq/{sample}.fastq.gz")  # one task instance per sample; that sample's fastq
 new_object("{{out}}")                    # a runtime-produced in-memory object called "out"
@@ -203,7 +168,7 @@ placeholders in the script. For shell tasks, *unnamed* inputs are
 allowed (passed positionally), and names can be CLI flags
 (`"--threads" = 8`, `"-o" = ...`).
 
-```{r}
+```r
 new_input(threads = 8, reads = new_file("reads.fq"))
 #  R/Python: the function must be  function(threads, reads) { ... }
 #  shell:    {threads} and {reads} get substituted in the script
@@ -227,7 +192,7 @@ concise way to declare an output you do not need to name:
 A task consumes another task's output by wrapping the producer's output
 pattern in `new_dep(task_id = "<producer>", value = <pattern>)`:
 
-```{r}
+```r
 producer <- new_R_task(
   task_id = "A",
   input   = new_input(df = new_object_exp("{dataset}")),
@@ -265,7 +230,7 @@ expansion of a task follows from its *inputs*, not its outputs.
 
 A minimal scatter and aggregate example:
 
-```{r}
+```r
 w_list <- new_wildcard_list(sample = c("s1", "s2", "s3", "s4"))
 
 per_sample <- new_R_task(           # runs 4 times, once per sample
@@ -351,7 +316,7 @@ function, so in practice, end the script with a function definition.
 `flumen` calls that function. Helper functions defined earlier in the
 script are allowed, and only the last one is the entry point.
 
-```{r}
+```r
 A <- new_R_task(
   task_id = "A",
   input   = new_input(x = 1, y = "abc"),
@@ -377,7 +342,7 @@ What to return depends on the output declaration:
 | a runtime-named file output: `new_file("dir/{{any}}.txt")` | ignored, just write files matching the pattern | the wrapper globs them afterwards. The backtick-quoted form of this pattern is shell-only and is rejected here |
 | multiple outputs | a named list: `list(out1 = v1, out2 = v2, ...)` | the names survive IPC and reach the consumer |
 
-```{r}
+```r
 exec = new_script('f <- function(x) x + 1')                     # single output, scalar
 exec = new_script('f <- function(df) list(df, df, df)')         # 3 downstream instances
 exec = new_script('f <- function(x) list(a = x*2, b = x*3)')    # named multi-output {{a}}, {{b}}
@@ -395,7 +360,7 @@ the next task with no intermediate files. Python is indent-sensitive,
 but `flumen` auto-dedents the string, so you can indent freely inside
 the R quotes.
 
-```{r}
+```r
 B <- new_python_task(
   task_id = "B",
   input   = new_input(df = new_dep(task_id = "A", value = new_object_exp("{{out_A}}"))),
@@ -427,7 +392,7 @@ escaping pitfalls. Named entries become flags (`"-w" = 4` becomes
 `-w 4`), unnamed entries pass positionally, and a simple flag is just an
 unnamed string.
 
-```{r}
+```r
 trim <- new_shell_task(
   task_id = "trim",
   input   = new_input("-w" = 4, "-i" = new_file_exp("fastq/{sample}.fastq.gz")),
@@ -443,7 +408,7 @@ pipes, redirections, derived variables, multiple commands, conditionals.
 `{name}` placeholders in the body are replaced with the matching
 parameter value (file paths are substituted as plain strings).
 
-```{r}
+```r
 align <- new_shell_task(
   task_id = "align",
   input   = new_input(threads = 8,
@@ -478,7 +443,7 @@ Points to note:
 
 # 6. Running and inspecting
 
-```{r}
+```r
 run_workflow(
   workflow,
   worker_list = list(new_worker(name = "w1", n_concurrent_task = 2)),
@@ -497,7 +462,7 @@ run_workflow(
 
 Before running, you can inspect the workflow in different ways:
 
-```{r}
+```r
 preview_workflow(workflow)         # static plan: tasks, instances, edges, port budget
 print(workflow)                    # one-line summary: how many tasks and instances
 plot(workflow)                     # render the DAG (uses igraph)
@@ -516,7 +481,7 @@ calling session: an object output stays in the worker cache, which is
 what lets the next task read it without a disk round-trip. To keep
 a result after the run, declare a file output and read it afterwards:
 
-```{r}
+```r
 B <- new_R_task(
   task_id = "B",
   input   = new_input(xs = new_dep(task_id = "A", value = new_object_aggr("{{out}}"))),
@@ -550,7 +515,7 @@ scheduler, each supervisor and each task wrapper write their own file
 there, so you can follow them while debugging a long run. From inside a
 task, append your own lines with `to_log()`:
 
-```{r}
+```r
 new_script('
   f <- function(df) {
     flumen::to_log(paste("rows:", nrow(df)), sender = "myop")
@@ -580,7 +545,7 @@ Before launching, `flumen` pre-flights the remote working directory (see
 the error in section 9), so a missing directory or an unreachable host
 is reported clearly rather than as a generic startup timeout.
 
-```{r}
+```r
 w_remote <- new_worker(
   name              = "remote1",
   self_host         = "192.168.1.50",      # the remote's IP/hostname, as seen by the master and by peers
@@ -600,7 +565,7 @@ A launcher is any object with a `launch_worker()` method, so a launcher
 that does nothing gives you exactly that: `flumen` reserves the TCP
 ports and waits for the worker, without attempting to start it.
 
-```{r}
+```r
 manual_launcher <- function(resources = NULL) {
   structure(list(resources = resources), class = "manual_launcher")
 }
@@ -620,7 +585,7 @@ directory is the worker's `root_path` (`ssh_launcher()` arranges this with
 `master_url` from the port plan `run_workflow()` prints at launch, using
 the notify port and that worker's control port:
 
-```{r}
+```r
 setwd("/data/flumen_run")   # the worker's root_path
 flumen::start_worker(master_url = "tcp://192.168.1.10:61000,61001", worker_id = "remote1")
 ```
@@ -666,7 +631,7 @@ causes are (1) the master cannot reach a worker's data-request port
 incorrect `master_host`), and the master emits a diagnostic naming the port
 it could not reach.
 
-```{r}
+```r
 w_local <- new_worker(name = "local1", n_concurrent_task = 2)
 
 run_workflow(
@@ -688,7 +653,7 @@ pre-staged but missing on the worker) is reported as a structured error
 before the task's wrapper starts. This is typical for genome indexes,
 annotation files, large reference databases.
 
-```{r}
+```r
 new_input(gtf = pre_staged(new_file("/refs/gencode.v44.annotation.gtf")))
 ```
 
@@ -749,7 +714,7 @@ one.
 This is an example on how tasks with different requirements are assigned
 to workers with different capabilities:
 
-```{r}
+```r
 gpu_worker  <- new_worker(
   name = "gpu1",  self_host = "10.0.0.21",
   launcher = ssh_launcher(host_user = "me@gpu-node",
@@ -800,7 +765,7 @@ Workers are selected as follows:
 If you pass a pool with no GPU worker, the run stops before launching
 any task:
 
-```{r}
+```r
 #> Flumen workflow rejected.
 #>   call      : run_workflow()
 #>   task      : train
@@ -847,6 +812,6 @@ locality-aware placement.
     `?new_object_exp`, `?new_object_aggr`, `?new_file_exp`,
     `?new_file_aggr` cover declaring data flow, while `?ssh_launcher`
     and `?start_worker` cover remote setup.
--   `docs/FLUMEN_DSL.md` in the source repository is the exhaustive
-    reference (every signature, every caveat, decision trees), kept in
-    sync with the code.
+-   [`FLUMEN_DSL.md`](FLUMEN_DSL.md) is the exhaustive reference (every
+    signature, every caveat, decision trees), kept in sync with the
+    code.

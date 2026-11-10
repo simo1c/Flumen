@@ -29,12 +29,9 @@ Imports:
 LinkingTo: Rcpp
 Suggests:
     testthat (>= 3.0.0),
-    knitr,
-    rmarkdown,
     bit64,
     jsonlite
 Config/testthat/edition: 3
-VignetteBuilder: knitr
 SystemRequirements: Python 3.9+ with pyarrow, pandas, numpy and pynng (optional, for Python ops)
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)

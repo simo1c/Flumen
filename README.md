@@ -85,15 +85,20 @@ This writes `test.Rds` in the working directory, holding
 
 ## Documentation
 
-``` r
-vignette("getting-started",   package = "flumen")  # concepts, the DSL, R/Python/shell, remote, resource pinning
-vignette("scrnaseq-annotation", package = "flumen") # worked scRNA-seq pipeline: Cell Ranger → Seurat → CellTypist, multi-machine
-```
+- [Getting started](docs/getting-started.md) — concepts, the DSL,
+  R/Python/shell tasks, remote workers, resource pinning.
+- [A multi-language scRNA-seq pipeline](docs/scrnaseq-annotation.md) — a
+  worked pipeline: Cell Ranger → Seurat → CellTypist, across three
+  machines with no shared filesystem.
+- [`FLUMEN_DSL.md`](docs/FLUMEN_DSL.md) — the exhaustive reference: every
+  constructor signature, the rules the validator enforces, and the
+  decision trees for choosing between the wildcard and aggregation
+  forms. Also an LLM-friendly resource for automatic workflow
+  construction.
 
-[`docs/FLUMEN_DSL.md`](docs/FLUMEN_DSL.md) in this repository is the
-exhaustive reference: every constructor signature, the rules the
-validator enforces, and the decision trees for choosing between the
-wildcard and aggregation forms. It is not installed with the package.
+These are read here in the repository and are not installed with the
+package. For the function reference, use R's own help: `?new_R_task`,
+`?new_dep`, `?run_workflow`.
 
 ## Citation
 
