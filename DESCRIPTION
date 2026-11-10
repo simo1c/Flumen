@@ -3,9 +3,9 @@ Type: Package
 Title: An R Workflow Manager for Distributed Bioinformatics without Centralized Storage
 Version: 1.0.0
 Authors@R: person("Simone", "Caligola", email = "s.caligola@gmail.com", role = c("aut", "cre"))
-Description: Workflow manager for data pipelines with streaming execution,
-    locality-aware scheduling, cross-machine distribution via TCP, and polyglot
-    operations ('R', 'Python', shell). Uses 'Arrow' IPC for data transfer and 'NNG'
+Description: Workflow manager for distributed bioinformatics with locality-aware scheduling, 
+    cross-machine distribution via TCP, and multi-language
+    tasks ('R', 'Python', shell). Uses 'Arrow' IPC for data transfer and 'NNG'
     sockets for low-latency messaging.
 License: MIT + file LICENSE
 URL: https://github.com/simo1c/Flumen
