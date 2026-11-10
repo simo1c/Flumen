@@ -9,7 +9,7 @@ across several hosts over TCP. Outputs move over sockets from the worker
 that produced them to the worker that needs them, so no centralized
 storage is required. Vectors, matrices and data frames cross as Apache
 Arrow IPC, which is also what lets a Python task read them natively,
-while other objects cross as qs2 between R tasks. Wildcards parametrise
+while other objects cross with an R-only serialization and require R tasks. Wildcards parametrise
 the DAG, which expands at build time where the values are known and at
 run time where a task discovers them.<br clear="right"/>
 
