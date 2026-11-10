@@ -85,20 +85,12 @@ This writes `test.Rds` in the working directory, holding
 
 ## Documentation
 
-- [Getting started](docs/getting-started.md) — concepts, the DSL,
-  R/Python/shell tasks, remote workers, resource pinning.
-- [A multi-language scRNA-seq pipeline](docs/scrnaseq-annotation.md) — a
-  worked pipeline: Cell Ranger → Seurat → CellTypist, across three
-  machines with no shared filesystem.
-- [`FLUMEN_DSL.md`](docs/FLUMEN_DSL.md) — the exhaustive reference: every
-  constructor signature, the rules the validator enforces, and the
-  decision trees for choosing between the wildcard and aggregation
-  forms. Also an LLM-friendly resource for automatic workflow
-  construction.
+- [Getting started](docs/getting-started.md): basic concepts to start with Flumen.
+- [A multi-language scRNA-seq pipeline](docs/scrnaseq-annotation.md): a
+  worked scRNA-seq pipeline across three machines with no shared filesystem.
+- [`FLUMEN_DSL.md`](docs/FLUMEN_DSL.md): the complete reference.
+  Also an LLM-friendly resource for automatic workflow construction.
 
-These are read here in the repository and are not installed with the
-package. For the function reference, use R's own help: `?new_R_task`,
-`?new_dep`, `?run_workflow`.
 
 ## Citation
 
