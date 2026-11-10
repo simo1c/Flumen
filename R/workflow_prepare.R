@@ -73,7 +73,7 @@ create_DAG <- function(task_list){
       n_not_connected <- length(not_connected)
       
       if(n_not_connected){
-        DAG <- add_vertices(DAG, n_not_connected, name = not_connected)
+        DAG <- igraph::add_vertices(DAG, n_not_connected, name = not_connected)
       }
     }
   }
