@@ -28,9 +28,6 @@ needs:
 pip3 install pyarrow pandas numpy pynng
 ```
 
-All four are imported when the Python wrapper starts, so a missing one
-stops the task before your code runs.
-
 ## Quick start
 
 A workflow expands over a set of values, runs one task instance per
