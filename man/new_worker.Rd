@@ -52,13 +52,13 @@ results. Defaults to \code{51200}.}
 uses \code{tempdir()} on the worker machine.}
 
 \item{R_cmd}{Character. R interpreter for R tasks. Defaults to
-\code{"Rscript"}. Use \code{"Rscript.exe"} on Windows.}
+\code{"Rscript"}.}
 
 \item{python_cmd}{Character. Python interpreter for Python tasks.
 Defaults to \code{"python3"}.}
 
 \item{shell_cmd}{Character. Shell for shell tasks. Defaults to
-\code{"bash"}. Use \code{"cmd.exe"} or \code{"powershell"} on Windows.}
+\code{"bash"}.}
 
 \item{root_path}{Optional character. Base directory for received files on
 this worker. \code{NULL} uses the current directory.}

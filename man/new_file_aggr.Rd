@@ -48,8 +48,7 @@ the order appears correct.
 
 Completeness and byte-level integrity are guaranteed: every producer
 instance is present exactly once, and each file arrives byte-identical,
-whatever its size relative to \code{chunk_size} and including zero-length
-files.
+whatever its size relative to \code{chunk_size} and including zero-length files.
 }
 
 \examples{

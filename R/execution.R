@@ -406,7 +406,8 @@ validate_exec_args <- function(workflow, worker_list, chunk_size) {
         fix   = paste("run the workers on a POSIX host: give each one a launcher,",
                       "new_worker(launcher = ssh_launcher(host_user = \"me@node\")), or start",
                       "it by hand with start_worker() and declare it with a launcher whose",
-                      "method does nothing. The scheduler itself runs on Windows")),
+                      "method does nothing. Running the scheduler on Windows with",
+                      "remote POSIX workers is untested")),
         call. = FALSE)
     }
   }

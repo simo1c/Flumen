@@ -15,7 +15,7 @@ A character vector with class \code{object}.
 }
 \description{
 Marks a value (or output placeholder) as an in-memory object passed
-between tasks without going through files. Use in \code{\link[=new_output]{new_output()}}
+between tasks without passing through files. Use in \code{\link[=new_output]{new_output()}}
 with a dynamic placeholder (e.g., \code{"{{out}}"}) so Flumen generates a
 unique output key, and in \code{\link[=new_input]{new_input()}} via \code{\link[=new_dep]{new_dep()}} to read a prior
 task's result.

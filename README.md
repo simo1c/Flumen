@@ -20,6 +20,8 @@ run time where a task discovers them.<br clear="right"/>
 remotes::install_github("simo1c/Flumen")
 ```
 
+Windows is not supported.
+
 Installing from source compiles a small amount of C++, so a compiler is
 needed. For Python tasks, the interpreter on every worker that runs them
 needs:

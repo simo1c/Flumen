@@ -204,8 +204,8 @@ new_python_task <- function(task_id,
 #' @return An object of class `task_object` with subclass `shell_task_object`.
 #'
 #' @section Shell interpreter:
-#' The shell used to run scripts (`bash` on Unix, `cmd.exe` or `powershell`
-#' on Windows) is configured at worker level via
+#' The shell used to run scripts (`bash` by default) is configured at worker
+#' level via
 #' `new_worker(shell_cmd = ...)`, not at task level.
 #'
 #' @seealso [new_R_task()], [new_python_task()], [new_cmd()], [new_script()]

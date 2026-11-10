@@ -32,8 +32,8 @@ and outputs are marshalled as CLI arguments; files are passed by path.
 }
 \section{Shell interpreter}{
 
-The shell used to run scripts (\code{bash} on Unix, \code{cmd.exe} or \code{powershell}
-on Windows) is configured at worker level via
+The shell used to run scripts (\code{bash} by default) is configured at worker
+level via
 \code{new_worker(shell_cmd = ...)}, not at task level.
 }
 

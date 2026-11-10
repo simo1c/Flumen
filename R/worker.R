@@ -340,11 +340,11 @@ validate_worker <- function(worker) {
 #' @param cache_dir Optional character. Directory for spilled results. `NULL`
 #'   uses `tempdir()` on the worker machine.
 #' @param R_cmd Character. R interpreter for R tasks. Defaults to
-#'   `"Rscript"`. Use `"Rscript.exe"` on Windows.
+#'   `"Rscript"`.
 #' @param python_cmd Character. Python interpreter for Python tasks.
 #'   Defaults to `"python3"`.
 #' @param shell_cmd Character. Shell for shell tasks. Defaults to
-#'   `"bash"`. Use `"cmd.exe"` or `"powershell"` on Windows.
+#'   `"bash"`.
 #' @param root_path Optional character. Base directory for received files on
 #'   this worker. `NULL` uses the current directory.
 #' @param launcher Optional. How the worker is bootstrapped. Three forms:

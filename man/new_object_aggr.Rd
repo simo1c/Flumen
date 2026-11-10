@@ -40,7 +40,7 @@ to reorder it.
 Indexing by position therefore attributes a result to the incorrect instance
 \strong{silently}, with no error and a successful run: the values are real, only
 assigned to the incorrect sample. To keep identity, have the producer return a
-\emph{named} value (named multi-output): the names travel with the data and
+\emph{named} value (named multi-output): the names are carried with the data and
 arrive aligned with it, so \code{ms[["s1"]]} is safe while \code{ms[[1]]} is not.
 
 \preformatted{
