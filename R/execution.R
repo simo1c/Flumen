@@ -154,7 +154,7 @@ run_workflow <- function(workflow,
       class = c("flumen_interrupted", "error", "condition"),
       list(message = flumen_block(
              "Flumen workflow interrupted.",
-             list(error = "stopped before completion; the workers were terminated")),
+             list(error = "stopped before completion, the workers were terminated")),
            call    = NULL)))
   }
   ## A genuine workflow failure: a structured error was recorded, or the
@@ -218,12 +218,9 @@ check_master_ports_free <- function(worker_list){
   if(length(busy)){
     stop(flumen_reject(
       call  = "run_workflow()",
-      error = sprintf(paste("master TCP port(s) %s are already in use on this host.",
-                            "Another flumen instance is probably running here, or a",
-                            "previous run did not release them"),
+      error = sprintf("master TCP port(s) %s are already in use on this host",
                       paste(busy, collapse = ", ")),
-      fix   = paste("stop the other instance, or launch with a different,",
-                    "non-overlapping run_workflow(ports = ...) range")), call. = FALSE)
+      fix   = "stop the other instance, or use a different run_workflow(ports = ...) range"), call. = FALSE)
   }
   invisible(NULL)
 }
@@ -393,14 +390,9 @@ validate_exec_args <- function(workflow, worker_list, chunk_size) {
     if(length(local_names) > 0){
       stop(flumen_reject(
         call  = "run_workflow()",
-        error = sprintf(paste("worker(s) %s have no launcher, so the scheduler would run them",
-                              "on this machine; local workers are not supported on Windows"),
+        error = sprintf("local workers are not supported on Windows: %s have no launcher",
                         paste(shQuote(local_names), collapse = ", ")),
-        fix   = paste("run the workers on a POSIX host: give each one a launcher,",
-                      "new_worker(launcher = ssh_launcher(host_user = \"me@node\")), or start",
-                      "it by hand with start_worker() and declare it with a launcher whose",
-                      "method does nothing. Running the scheduler on Windows with",
-                      "remote POSIX workers is untested")),
+        fix   = "give each worker a launcher, new_worker(launcher = ssh_launcher(...))"),
         call. = FALSE)
     }
   }
@@ -414,8 +406,7 @@ validate_exec_args <- function(workflow, worker_list, chunk_size) {
       call  = "run_workflow()",
       error = sprintf("duplicate worker name(s): %s",
                       paste(shQuote(dup_names), collapse = ", ")),
-      fix   = paste("give each worker a unique name; a manually started worker must",
-                    "pass the same value as start_worker(worker_id = )")), call. = FALSE)
+      fix   = "give each worker a unique name, matching start_worker(worker_id = )"), call. = FALSE)
   }
 
   if(is.null(chunk_size) || !is.numeric(chunk_size) ||
@@ -442,9 +433,7 @@ validate_exec_args <- function(workflow, worker_list, chunk_size) {
           task  = task$task_id,
           error = sprintf(paste("requires resources that no worker in worker_list can",
                                 "satisfy: %s"), format_resources(task$requires)),
-          fix   = paste("add a worker that declares matching or greater resources, on",
-                        "new_worker() for a local worker or on its launcher for a remote",
-                        "one, or relax the requirement")), call. = FALSE)
+          fix   = "add a worker with matching resources, or relax the requirement"), call. = FALSE)
       }
     }
   }
@@ -479,8 +468,7 @@ setup_remote_worker_tcp <- function(worker_list, master_host, ports) {
       any(diff(as.integer(ports)) != 1L)) {
     stop(flumen_reject(
       call  = "run_workflow()",
-      error = paste("'ports' must be a contiguous integer range of length >= 2 with all",
-                    "values in [1024, 65535]"),
+      error = "'ports' must be a contiguous range of >= 2 values in [1024, 65535]",
       fix   = "run_workflow(ports = 61000:61099)"), call. = FALSE)
   }
   ports <- as.integer(ports)
@@ -495,8 +483,7 @@ setup_remote_worker_tcp <- function(worker_list, master_host, ports) {
   if (length(ports) < n_ports_needed) {
     stop(flumen_reject(
       call  = "run_workflow()",
-      error = sprintf(paste("'ports' has %d ports but %d remote worker(s) need %d",
-                            "(1 shared notify + 2 per worker, control and terminate)"),
+      error = sprintf("'ports' has %d ports but %d remote worker(s) need %d",
                       length(ports), n_remote, n_ports_needed),
       fix   = "widen the range, run_workflow(ports = 61000:61099)"), call. = FALSE)
   }
@@ -541,8 +528,7 @@ setup_remote_worker_tcp <- function(worker_list, master_host, ports) {
           error = sprintf("overlapping TCP port ranges: '%s' %d..%d and '%s' %d..%d",
                           rs[[k - 1L]]$label, rs[[k - 1L]]$lo, rs[[k - 1L]]$hi,
                           rs[[k]]$label, rs[[k]]$lo, rs[[k]]$hi),
-          fix   = paste("give them non-overlapping ranges, in new_worker(ports = ...)",
-                        "or in the run_workflow(ports = ...) pool")), call. = FALSE)
+          fix   = "give them non-overlapping ranges in new_worker(ports = ...)"), call. = FALSE)
       }
     }
   }
@@ -674,8 +660,7 @@ print_port_plan <- function(worker_list) {
       tgt, paste(ssh_ports, collapse = ",")))
   }
 
-  ## One translation, not a dump per firewall. macOS differs in kind rather than
-  ## in syntax, so it is named only when the master actually runs there.
+  ## One translation, not a dump per firewall.
   ex_ctrl <- { sel <- which(master_hosts == master_h[1])
                cps <- unlist(lapply(sel, function(j) c(parsed[[j]]$notify, parsed[[j]]$ctrl,
                                                        parsed[[j]]$ctrl + 1L)))
@@ -683,10 +668,6 @@ print_port_plan <- function(worker_list) {
                else as.character(min(cps)) }
   lines <- c(lines, sprintf("  example rule:  ufw allow from %s to any port %s proto tcp",
                             remote_hosts[1], ex_ctrl))
-  if (identical(tolower(Sys.info()[["sysname"]]), "darwin"))
-    lines <- c(lines,
-      "  on macOS the built-in firewall filters by application, not by port: allow",
-      "  incoming connections for the R executable instead of opening a range")
 
   message(paste(lines, collapse = "\n"))
   invisible(NULL)

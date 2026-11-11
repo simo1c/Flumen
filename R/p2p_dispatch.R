@@ -169,10 +169,8 @@ p2p_filter_param <- function(param_req, data_type, result_is_arrow,
     result_group_names <- gn
     keep <- keep & (gn == want)
     if(!any(keep))
-      stop(sprintf(paste0("output '%s' was not found among the producer's results ",
-                          "(declared outputs seen: %s). Fix: a task declaring several dynamic ",
-                          "outputs must return a NAMED list or dict whose names are the ",
-                          "declared output names."),
+      stop(sprintf(paste0("output '%s' not among the producer's results (seen: %s). ",
+                          "Fix: return a named list whose names are the declared outputs."),
                    want, paste(ifelse(nzchar(gn), gn, "<unnamed>"), collapse = ", ")),
            call. = FALSE)
   }

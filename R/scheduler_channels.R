@@ -207,8 +207,7 @@ open_remote_worker_channels <- function(supervisor_info,
         worker = rw_name,
         error  = sprintf("could not open the ctrl/term listen sockets on ports %d/%d: %s",
                          ctrl_port, term_port, conditionMessage(e)),
-        fix    = paste("a port may be in use by another process; widen",
-                       "run_workflow(ports = ...)")), call. = FALSE)
+        fix    = "a port may be in use, widen run_workflow(ports = ...)"), call. = FALSE)
     })
     socket_list  <- add_socket(socket_list, socks$ctrl, ctrl_name)
     socket_list  <- add_socket(socket_list, socks$term, term_name)

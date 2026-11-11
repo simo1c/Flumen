@@ -112,9 +112,7 @@ new_message <- function(sender,
         stop(flumen_fail(
           call  = "dispatch",
           error = sprintf("file '%s' not found on the master at dispatch time", bin),
-          fix   = paste("create it on the master if it is transferred with new_file();",
-                        "if it is already on the worker, wrap the input with",
-                        "pre_staged()")), call. = FALSE)
+          fix   = "create it on the master, or wrap the input with pre_staged()"), call. = FALSE)
       }
       ## A directory passes file.exists() but file(dir, "rb") fails with the
       ## opaque "cannot open the connection". This happens when a "full bundle"
@@ -123,13 +121,9 @@ new_message <- function(sender,
       if(dir.exists(bin)){
         stop(flumen_fail(
           call  = "dispatch",
-          error = sprintf(paste("output path '%s' is a directory, and flumen transfers",
-                                "files only; a '{{any}}' wildcard with no extension",
-                                "matches every entry in the folder, sub-directories",
-                                "included"), bin),
-          fix   = sprintf(paste("narrow the pattern, new_file('`%s/`{{any}}.ext') or",
-                                "new_file_aggr('`%s/`{{any}}.ext')"),
-                          dirname(bin), dirname(bin))), call. = FALSE)
+          error = sprintf("output path '%s' is a directory and flumen transfers files only", bin),
+          fix   = sprintf("narrow the pattern, new_file('`%s/`{{any}}.ext')",
+                          dirname(bin))), call. = FALSE)
       }
       con <- file(bin, "rb")
       chunk_info <- read_chunk(con, chunk, eff_chunk_size)
@@ -670,15 +664,13 @@ merge_all_chunks <- function(chunk_list, strict = TRUE) {
       } else
         stop(flumen_fail(
           call  = "transfer",
-          error = sprintf(paste("element %d of the message from '%s' reassembled to %s",
-                                "bytes, the sender declared %s (%d chunk(s) received);",
-                                "the transfer lost or duplicated data"),
+          error = sprintf(paste("element %d from '%s' reassembled to %s bytes,",
+                                "sender declared %s (%d chunk(s))"),
                           i, chunk_list[[1]]$message[[i]]$sender,
                           format(got_size, scientific = FALSE),
                           format(as.numeric(exp_size), scientific = FALSE),
                           length(chunk_list)),
-          fix   = paste("the payload is not usable; re-run, and report it with the",
-                        "worker logs if it repeats")), call. = FALSE)
+          fix   = "re-run, and report it with the worker logs if it repeats"), call. = FALSE)
       }
     }
 
@@ -799,10 +791,7 @@ write_chunk_to_file <- function(file_name,
         call  = "transfer",
         error = sprintf("cannot create the directory '%s' for the incoming file '%s'",
                         dirname, file_name),
-        fix   = paste("an absolute declared path is used as given on every worker, so it must",
-                      "exist and be writable on this one: create it, or declare the path",
-                      "relative to the worker's root_path and flumen will place it under",
-                      "that root")), call. = FALSE)
+        fix   = "create it on this worker, or declare the path relative to root_path"), call. = FALSE)
   }
 
   ## Chunks go to a temporary file beside the destination, renamed onto it once
@@ -866,12 +855,10 @@ write_chunk_to_file <- function(file_name,
         unlink(part_name)
         stop(flumen_fail(
           call  = "transfer",
-          error = sprintf(paste("file '%s' was written with %s bytes, the sender declared",
-                                "%s (%s chunk(s)); the transfer lost or duplicated data"),
+          error = sprintf("file '%s' was written with %s bytes, sender declared %s (%s chunk(s))",
                           file_name, format(got, scientific = FALSE),
                           format(as.numeric(tot_size), scientific = FALSE), n_chunks),
-          fix   = paste("the file is not usable; re-run, and report it with the",
-                        "worker logs if it repeats")), call. = FALSE)
+          fix   = "re-run, and report it with the worker logs if it repeats"), call. = FALSE)
       }
     }
   }
@@ -994,8 +981,7 @@ short_ipc_file <- function(){
   if(n > IPC_PATH_MAX){
     stop(flumen_reject(
       call  = "run_workflow()",
-      error = sprintf(paste("the temporary directory is too deep for local IPC sockets:",
-                            "'%s' is %d bytes and the operating system accepts at most %d"),
+      error = sprintf("temporary directory too deep for IPC sockets: '%s' is %d bytes, max %d",
                       path, n, IPC_PATH_MAX),
       fix   = "point TMPDIR at a shorter directory, TMPDIR=/tmp, and restart R"),
       call. = FALSE)
@@ -1116,8 +1102,7 @@ init_sockets <- function(socket_list,
       if(is.null(sock_res_path) || is.null(sock_ctrl_path) || is.null(sock_term_path)){
         stop(flumen_reject(
       call  = "init_sockets()",
-      error = paste("a local supervisor requires sock_res_path, sock_ctrl_path and",
-                    "sock_term_path from the scheduler arguments")), call. = FALSE)
+      error = "a local supervisor requires sock_res_path, sock_ctrl_path and sock_term_path"), call. = FALSE)
       }
       sock_res  <- nanonext::socket(protocol = "push", dial = sock_res_path)
       sock_ctrl <- nanonext::socket(protocol = "pair", dial = sock_ctrl_path)

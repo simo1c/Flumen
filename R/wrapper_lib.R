@@ -173,14 +173,9 @@ wrapper_refuse_preexisting_outputs <- function(out_files, task_id, s, chunk_size
     shown <- present
     more  <- length(shown) - max_named
     if(more > 0L) shown <- c(shown[seq_len(max_named)], sprintf("and %d more", more))
-    err <- sprintf(paste0(
-      "instance '%s' declares the output '%s', but %s already exist%s before the task runs, ",
-      "so what the task produced could not be told from what was already there and a ",
-      "consumer might read stale data: %s. Fix: remove the file(s) or write to another ",
-      "path; a task cannot overwrite its own previous run's outputs."),
-      task_id, f, if(is_dyn) sprintf("%d file(s) matching it", length(present)) else "it",
-      if(is_dyn && length(present) > 1L) "" else "s",
-      paste(shown, collapse = ", "))
+    err <- sprintf(
+      "instance '%s' output '%s' already exists: %s. Fix: remove it or write to another path.",
+      task_id, f, paste(shown, collapse = ", "))
     to_log(paste0("[WR_ERR] ", err), task_id)
     send_error_message(task_id, s, chunk_size, err)
     close(s)

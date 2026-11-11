@@ -133,8 +133,7 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
                       paste(shQuote(vapply(task_list[not_task],
                                            function(x) paste(class(x), collapse = "/"),
                                            character(1))), collapse = ", ")),
-      fix   = paste("'task_list' must contain only tasks built with new_R_task(),",
-                    "new_python_task() or new_shell_task()")), call. = FALSE)
+      fix   = "use new_R_task(), new_python_task() or new_shell_task()"), call. = FALSE)
   }
 
   task_ids <- vapply(task_list, function(op) as.character(op$task_id), character(1))
@@ -246,12 +245,10 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
         stop(flumen_reject(
           call  = "new_workflow()",
           task  = op$task_id,
-          error = sprintf(paste("new_object_aggr('%s'%s) uses a static wildcard pattern;",
-                                "object aggregation groups by a DYNAMIC name"),
+          error = sprintf("new_object_aggr('%s'%s) uses a static wildcard pattern",
                           as.character(dep_value_for_check), by_txt),
-          fix   = sprintf(paste("new_object_aggr('{{name}}'%s), matching the producer's",
-                                "new_object('{{name}}'). A static {wc} pattern belongs to",
-                                "file aggregation, new_file_aggr()"), by_txt)), call. = FALSE)
+          fix   = sprintf(paste("use new_object_aggr('{{name}}'%s), or new_file_aggr()",
+                                "for a static {wc}"), by_txt)), call. = FALSE)
       }
 
       ## (3c) dep value-vs-producer-output pattern check.
@@ -336,8 +333,7 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
                 call      = "new_workflow()",
                 task      = op$task_id,
                 parameter = sprintf("#%d", j),
-                error     = sprintf(paste("new_dep(task_id = '%s', value = %s('%s')) declares a %s,",
-                                          "but '%s' produces a %s for that pattern"),
+                error     = sprintf("new_dep('%s', %s('%s')) declares a %s but '%s' produces a %s",
                                     dep_op, dep_kw, dep_value_for_check, dep_kind,
                                     dep_op, prod_kind),
                 fix       = sprintf("use %s() to match the producer", prod_kw)),
@@ -397,12 +393,9 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
               call      = "new_workflow()",
               task      = op$task_id,
               parameter = sprintf("output #%d", j),
-              error     = sprintf(paste("the declared value repeats the dynamic pattern %s;",
-                                        "a vector output declares DISTINCT entries"),
+              error     = sprintf("the declared value repeats the dynamic pattern %s",
                                   paste(shQuote(.dup), collapse = ", ")),
-              fix       = paste("keep one entry per distinct pattern; a bundle is several",
-                                "DIFFERENT paths under one name, and a repeated pattern adds",
-                                "nothing a single one does not already declare")), call. = FALSE)
+              fix       = "keep one entry per distinct pattern"), call. = FALSE)
           }
         }
       }
@@ -414,8 +407,7 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
           call      = "new_workflow()",
           task      = op$task_id,
           parameter = sprintf("#%d", j),
-          error     = sprintf(paste("%d distinct dynamic wildcards: %s; at most one is",
-                                    "allowed per parameter"),
+          error     = sprintf("at most one dynamic wildcard per parameter, found %d: %s",
                               length(wcs$dynamic),
                               paste(shQuote(wcs$dynamic), collapse = ", ")),
           fix       = "keep one, and move the other to its own parameter"), call. = FALSE)
@@ -460,12 +452,9 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
       stop(flumen_reject(
         call  = "new_workflow()",
         task  = op$task_id,
-        error = sprintf(paste("outputs #%s are pure dynamic wildcards with no static",
-                              "discriminator, so a consumer cannot select one"),
+        error = sprintf("outputs #%s are pure dynamic wildcards with no static discriminator",
                         paste(nonaddr_out, collapse = ", ")),
-        fix   = paste("return one named list, gathered with new_object_aggr(\"{{out}}\"),",
-                      "or give each output a static discriminator,",
-                      "new_file(\"dir_a/{{x}}\") and new_file(\"dir_b/{{x}}\")")),
+        fix   = "give each output a static discriminator, new_file(\"dir_a/{{x}}\")"),
         call. = FALSE)
     }
   }
@@ -504,8 +493,7 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
         stop(flumen_reject(
           call  = "new_workflow()",
           error = sprintf("wildcard '%s' has an empty or NA value", wd),
-          fix   = paste("every value must be a non-empty string; check for blank lines",
-                        "or a trailing separator in the source")), call. = FALSE)
+          fix   = "every value must be a non-empty string"), call. = FALSE)
       }
       ## (5d) backslash: used as a gsub() REPLACEMENT during expansion, an
       ## unescaped backslash is read as a backreference (\1, \U, ...).
@@ -532,9 +520,7 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
       if(length(bad) > 0){
         stop(flumen_reject(
           call  = "new_workflow()",
-          error = sprintf(paste("wildcard '%s' has the value %s, which is the wildcard's",
-                                "own name: flumen reserves it internally and would",
-                                "confuse that instance with an aggregation"),
+          error = sprintf("wildcard '%s' has the value %s, which is its own name and is reserved",
                           wd, paste(shQuote(bad), collapse = ", ")),
           fix   = "rename the value or the wildcard"), call. = FALSE)
       }
@@ -600,8 +586,7 @@ validate_no_mixed_output_kinds <- function(task_list){
       stop(flumen_reject(
         call  = "new_workflow()",
         task  = op$task_id,
-        error = sprintf(paste("declares file output(s) (%s) and object output(s) (%s);",
-                              "the outputs of a task must be all files or all objects"),
+        error = sprintf("declares both file output(s) (%s) and object output(s) (%s)",
                         paste(shQuote(file_outs), collapse = ", "),
                         paste(shQuote(obj_outs), collapse = ", ")),
         fix   = "move the object to a downstream task, or write it to a file as well"),
@@ -698,12 +683,9 @@ validate_no_colliding_expanded_outputs <- function(task_list){
       stop(flumen_reject(
         call  = "new_workflow()",
         task  = op$task_id,
-        error = sprintf(paste("the task fans out per wildcard value, but its file output",
-                              "'%s' contains no wildcard, so every instance overwrites",
-                              "the previous one"),
+        error = sprintf("the task fans out but its file output '%s' contains no wildcard",
                         as.character(unlist(val))[1]),
-        fix   = paste("add the wildcard to the path, 'out_{sample}.txt', or declare a",
-                      "dynamic output '{{name}}' when the names are known only at run time")),
+        fix   = "add the wildcard to the path, 'out_{sample}.txt'"),
         call. = FALSE)
     }
   }
@@ -878,15 +860,10 @@ validate_no_shared_dynamic_namespace <- function(task_list, wildcard_list = NULL
       stop(flumen_reject(
         call  = "new_workflow()",
         task  = op$task_id,
-        error = sprintf(paste("the task runs once per '{%s}' and its dynamic file output",
-                              "'%s' carries no static wildcard, so each instance claims",
-                              "every file that appears while it runs"),
+        error = sprintf("runs once per '{%s}' but dynamic output '%s' has no static wildcard",
                         exp_wc[1], as.character(unlist(val))[1]),
-        fix   = sprintf(paste("put the wildcard in the path, '%s/{%s}/{{name}}.ext' or",
-                              "'{%s}_{{name}}.ext'; if the names are known, declare them",
-                              "instead, '{%s}.ext'"),
-                        dirname(as.character(unlist(val))[1]), exp_wc[1],
-                        exp_wc[1], exp_wc[1])), call. = FALSE)
+        fix   = sprintf("put the wildcard in the path, '%s/{%s}/{{name}}.ext'",
+                        dirname(as.character(unlist(val))[1]), exp_wc[1])), call. = FALSE)
     }
   }
   invisible(TRUE)
@@ -1003,8 +980,7 @@ validate_no_overlapping_output_globs <- function(task_list, DAG = NULL){
         stop(flumen_reject(
           call  = "new_workflow()",
           tasks = sprintf("%s, %s", deep$who, deep$other),
-          error = sprintf(paste("'%s' declares the whole-folder output '%s', collected",
-                                "recursively, so it also claims what '%s' writes into '%s'"),
+          error = sprintf("'%s' collects '%s' recursively, claiming what '%s' writes into '%s'",
                           deep$who, deep$pat, deep$other, deep$odir),
           fix   = paste("add an extension after the wildcard, use separate folders,",
                         "or order the tasks")), call. = FALSE)
@@ -1012,13 +988,10 @@ validate_no_overlapping_output_globs <- function(task_list, DAG = NULL){
       stop(flumen_reject(
         call  = "new_workflow()",
         tasks = sprintf("%s, %s", ti, tj),
-        error = sprintf(paste("both can run at the same time and write into '%s', where",
-                              "their output names overlap ('%s' and '%s')"),
+        error = sprintf("both write into '%s' with overlapping names ('%s' and '%s')",
                         a$dir, a$pat, b$pat),
-        fix   = sprintf(paste("give the patterns a distinct prefix, '%s/left_{{name}}.ext'",
-                              "and '%s/right_{{name}}.ext', write into separate directories,",
-                              "or make one task depend on the other"),
-                        a$dir, a$dir)), call. = FALSE)
+        fix   = sprintf("give the patterns a distinct prefix, '%s/left_{{name}}.ext'",
+                        a$dir)), call. = FALSE)
     }
   }
     }
@@ -1067,10 +1040,8 @@ validate_no_bare_wildcard <- function(task_list) {
         parameter = sprintf("%s '%s'", param_role, par_name),
         error     = sprintf(paste("the bare dynamic wildcard '%s' is passed as a literal",
                                   "and never substituted"), offending),
-        fix       = sprintf(paste("wrap it, new_object(\"%s\") or new_file(\"path/%s.ext\");",
-                                  "on a consumer dep, new_object_aggr(\"%s\") or",
-                                  "new_file_aggr(\"path/%s.ext\")"),
-                            offending, offending, offending, offending)), call. = FALSE)
+        fix       = sprintf("wrap it, new_object(\"%s\") or new_file(\"path/%s.ext\")",
+                            offending, offending)), call. = FALSE)
     } else {
       offending <- static_m[1]
       stop(flumen_reject(
@@ -1079,11 +1050,8 @@ validate_no_bare_wildcard <- function(task_list) {
         parameter = sprintf("%s '%s'", param_role, par_name),
         error     = sprintf("the bare static wildcard '%s' defaults to vector binding",
                             offending),
-        fix       = sprintf(paste("state the intent, new_object_exp(\"%s\") or",
-                                  "new_file_exp(\"path/%s.ext\") for one instance per value;",
-                                  "new_object(\"%s\") or new_file(\"path/%s.ext\") for all",
-                                  "values as a vector"),
-                            offending, offending, offending, offending)), call. = FALSE)
+        fix       = sprintf("new_object_exp(\"%s\") per value, new_object(\"%s\") for a vector",
+                            offending, offending)), call. = FALSE)
     }
   }
 
@@ -1174,14 +1142,11 @@ validate_no_mixed_expansion_drivers <- function(task_list) {
         stop(flumen_reject(
           call  = "new_workflow()",
           task  = op$task_id,
-          error = sprintf(paste("input parameters on wildcard '{%s}' have conflicting",
-                                "expansion drivers: %s use new_object_exp / new_file_exp,",
-                                "%s do not"),
+          error = sprintf("conflicting expansion on wildcard '{%s}': %s use _exp, %s do not",
                           wc,
                           paste(shQuote(exp_params),     collapse = ", "),
                           paste(shQuote(non_exp_params), collapse = ", ")),
-          fix   = paste("use the _exp forms on every parameter to fan the task out,",
-                        "or none of them to bind the wildcard as a vector")), call. = FALSE)
+          fix   = "use the _exp forms on every parameter, or none"), call. = FALSE)
       }
     }
   }
@@ -1216,7 +1181,7 @@ validate_aggr_by_wildcards <- function(task_list, wildcard_list = NULL) {
             call      = "new_workflow()",
             task      = op$task_id,
             parameter = sprintf("'%s'", par$name),
-            error     = sprintf("aggregates by = %s, which is not a declared wildcard; known wildcards: %s",
+            error     = sprintf("by = %s is not a declared wildcard, known: %s",
                                 paste(shQuote(unknown), collapse = ", "),
                                 if (length(declared)) paste(declared, collapse = ", ")
                                 else "(none declared)"),
@@ -1263,8 +1228,7 @@ validate_arrow_object_literals <- function(task_list) {
         task      = op$task_id,
         parameter = sprintf("'%s'", par$name),
         error     = .m$error,
-        fix       = paste0(.m$fix, "; the value is written directly in new_input(), ",
-                           "so it can be changed where it is declared")), call. = FALSE)
+        fix       = .m$fix), call. = FALSE)
     }
   }
   invisible(NULL)
@@ -1288,8 +1252,7 @@ validate_python_literal_arrow_types <- function(task_list) {
         task      = op$task_id,
         parameter = sprintf("'%s'", par$name),
         error     = .m$error,
-        fix       = paste0(.m$fix, "; the value is written directly in new_input(), ",
-                           "so it can be changed where it is declared")), call. = FALSE)
+        fix       = .m$fix), call. = FALSE)
     }
   }
   invisible(TRUE)
@@ -1321,8 +1284,7 @@ validate_input_file_existence <- function(task_list) {
             task    = op$task_id,
             warning = sprintf(paste("input '%s' is set to be transferred but does not",
                                     "exist on the master"), p),
-            fix     = paste("create it on the master, or wrap it with pre_staged() if",
-                            "it is already on the worker")), call. = FALSE)
+            fix     = "create it on the master, or wrap it with pre_staged()"), call. = FALSE)
         }
       }
     }
@@ -1353,11 +1315,9 @@ validate_output_folder_paths <- function(task_list) {
             call  = "new_workflow()",
             task  = op$task_id,
             error = sprintf("ambiguous output path '%s', which looks like a folder", p),
-            fix   = sprintf(paste("pick the intended form: whole folder recursively,",
-                                  "new_file('`%s/`{{any}}'); only matching files,",
-                                  "new_file('`%s/`{{any}}.ext'); a single file,",
+            fix   = sprintf(paste("whole folder, new_file('`%s/`{{any}}'), or one file,",
                                   "new_file('%s/output.ext')"),
-                            clean, clean, clean)), call. = FALSE)
+                            clean, clean)), call. = FALSE)
         }
       }
     }
@@ -1392,8 +1352,7 @@ validate_balanced_backticks <- function(task_list) {
             task      = op$task_id,
             parameter = sprintf("%s '%s'", param_role, par$name),
             error     = sprintf("unbalanced backtick (`) in value '%s'", elem),
-            fix       = paste("pair them; backticks delimit a static prefix,",
-                              "new_file(\"`prefix/`{{any}}.ext\")")), call. = FALSE)
+            fix       = "backticks delimit a static prefix, new_file(\"`prefix/`{{any}}.ext\")"), call. = FALSE)
         }
       }
     }
@@ -1436,12 +1395,8 @@ validate_no_aggr_outside_dep <- function(task_list) {
         call      = "new_workflow()",
         task      = op$task_id,
         parameter = sprintf("input '%s'", par$name),
-        error     = paste("new_object_aggr() / new_file_aggr() has no static wildcard",
-                          "to drive the aggregation, so it gathers nothing"),
-        fix       = paste("from pre-existing files, new_file_aggr(\"path_{wildcard}.ext\");",
-                          "from an upstream output, new_dep(\"<producer>\",",
-                          "new_object_aggr(\"{{name}}\")); for a single value,",
-                          "new_object(...) or new_file(...)")), call. = FALSE)
+        error     = "new_object_aggr() / new_file_aggr() has no static wildcard to aggregate by",
+        fix       = "new_file_aggr(\"path_{wc}.ext\") or new_object_aggr(\"{{name}}\")"), call. = FALSE)
     }
   }
 }
@@ -1476,9 +1431,8 @@ validate_no_empty_constructor_values <- function(task_list) {
           task      = op$task_id,
           parameter = sprintf("%s '%s'", param_role, par$name),
           error     = sprintf("%s has an empty-string value", ctor),
-          fix       = paste("give it a path, new_file(\"path/to/file\"), or a name marker,",
-                            "new_object(\"{{name}}\"); for an empty CLI argument use",
-                            "new_input(arg = \"\")")), call. = FALSE)
+          fix       = paste("give it a path, new_file(\"path/to/file\"), or a name,",
+                            "new_object(\"{{name}}\")")), call. = FALSE)
       }
     }
   }
@@ -1529,10 +1483,8 @@ validate_backtick_has_static_content <- function(task_list) {
               parameter = sprintf("%s '%s'", param_role, par$name),
               error     = sprintf("backtick pair '%s' enclosing only wildcards in value '%s'",
                                   bt, elem),
-              fix       = paste("backticks delimit a static prefix and must contain literal",
-                                "text, new_file(\"`literal_prefix/`{{any}}.ext\"); to fan out",
-                                "on a static wildcard instead, drop them,",
-                                "new_file_exp(\"prefix_{x}.ext\")")), call. = FALSE)
+              fix       = paste("backticks must contain literal text,",
+                                "new_file(\"`prefix/`{{any}}.ext\")")), call. = FALSE)
           }
         }
       }
@@ -1570,9 +1522,7 @@ validate_no_backticks_in_non_shell_task <- function(task_list) {
           call      = "new_workflow()",
           task      = sprintf("%s (%s)", op$task_id, op$type),
           parameter = sprintf("%s '%s'", param_role, par$name),
-          error     = sprintf(paste("backticks in value '%s'; they are a SHELL-ONLY",
-                                    "construct, and R / Python tasks receive the resolved",
-                                    "file list either way"), offending[1]),
+          error     = sprintf("backticks in value '%s' are shell-only", offending[1]),
           fix       = "use new_file_*(\"path/{{any}}.ext\")"), call. = FALSE)
       }
     }

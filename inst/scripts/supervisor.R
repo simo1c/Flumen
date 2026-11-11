@@ -178,9 +178,8 @@ while(TRUE){
                          as.numeric(difftime(Sys.time(), orphan_t0, units = "secs")),
                          ORPHAN_CONNECT_TIMEOUT)){
     to_log(paste0("ORPHANED: no scheduler at ", master_url, " within ",
-                  ORPHAN_CONNECT_TIMEOUT, "s; this worker stops. Fix: check master_host, ",
-                  "or export FLUMEN_ORPHAN_CONNECT_SECS on this host before the worker starts; ",
-                  "the master's shell has no effect on it."),
+                  ORPHAN_CONNECT_TIMEOUT, "s. Fix: check master_host, ",
+                  "or raise FLUMEN_ORPHAN_CONNECT_SECS on this host."),
            worker_name)
     try(flumen:::clean_termination(state$all_pid, state$socket_list, state$result_cache),
         silent = TRUE)
@@ -193,8 +192,8 @@ while(TRUE){
     to_log(paste0("SCHEDULER SILENT: no answer for ",
                   round(as.numeric(difftime(Sys.time(), state$last_scheduler_contact,
                                             units = "secs"))),
-                  "s (threshold ", scheduler_silence(), "s); this worker stops. Fix: raise ",
-                  "FLUMEN_SCHEDULER_SILENCE_SECS in the shell that launches the run."),
+                  "s (threshold ", scheduler_silence(), "s). ",
+                  "Fix: raise FLUMEN_SCHEDULER_SILENCE_SECS."),
            worker_name)
     try(flumen:::clean_termination(state$all_pid, state$socket_list, state$result_cache),
         silent = TRUE)

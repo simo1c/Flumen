@@ -620,9 +620,8 @@ sched_handle_result <- function(msg, state, recv_socket){
         supervisor_ID = "central_scheduler", task_id = .tid,
         exe_id = .inst[[.owner[.hit[1L]]]]$exe_id,
         message = sprintf(
-          paste0("expanded into %d instances at run time, and %s, so the instances claim ",
-                 "one another's files. Fix: return an object output (new_object), or give ",
-                 "the instances output names that cannot match each other."),
+          paste0("expanded into %d instances and %s, so they claim one another's files. ",
+                 "Fix: return an object output (new_object)."),
           .n_share, .why)))
       scheduler_teardown(state, 1)
     }
@@ -757,10 +756,8 @@ sched_check_worker_silence <- function(state){
       task_id = as.character(ops)[1],
       exe_id  = held[1],
       message = sprintf(
-        paste0("worker '%s' has not been heard from for %.0fs while holding %d task(s) ",
-               "(%s); those tasks can no longer report, so the run is stopped instead of ",
-               "waiting. Fix: if a pause this long is expected, raise ",
-               "FLUMEN_WORKER_SILENCE_SECS in the shell that launches the run."),
+        paste0("worker '%s' silent for %.0fs while holding %d task(s) (%s). ",
+               "Fix: raise FLUMEN_WORKER_SILENCE_SECS if a pause this long is expected."),
         w, quiet, length(held), paste(unique(as.character(ops)), collapse = ", "))))
     scheduler_teardown(state, 1)
   }
@@ -789,9 +786,8 @@ sched_check_startup_timeout <- function(state){
   
   missing <- if(!is.null(si)) setdiff(as.character(si$Supervisor_ID), state$workers_ready) else character(0)
   hint <- sprintf(paste0(
-    "startup timeout after %.0fs: worker(s) %s did not reach the scheduler. Fix: check\n",
-    "  start_worker on each node, the ports in run_workflow(ports=) and\n",
-    "  new_worker(ports=), and master_host / self_host."),
+    "startup timeout after %.0fs: worker(s) %s did not reach the scheduler. ",
+    "Fix: check start_worker on each node, the ports, and master_host / self_host."),
     state$startup_timeout,
     if(length(missing)) paste(shQuote(missing), collapse = ", ") else "<unknown>")
   msg_lines <- c(hint, format_reachability(r))

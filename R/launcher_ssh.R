@@ -136,16 +136,15 @@ probe_remote_dir <- function(config, worker, remote_dir){
       worker = worker$name,
       target = sprintf("%s, port %d", config$host_user, config$host_port),
       error  = paste0("cannot reach the host over SSH.", said),
-      fix    = sprintf(paste("check passwordless SSH and that the host is reachable;",
-                             "verify with: ssh %s echo ok"), config$host_user))
+      fix    = sprintf("check passwordless SSH, verify with: ssh %s echo ok",
+                       config$host_user))
   } else {
     flumen_launch_fail(
       worker = worker$name,
-      error  = sprintf(paste("the remote working directory %s does not exist on %s;",
-                             "this is the launcher 'cwd', falling back to the worker",
-                             "'root_path'.%s"), qdir, config$host_user, said),
-      fix    = sprintf(paste("create it on the remote host, or pass a valid path;",
-                             "verify with: ssh %s ls -ld %s"), config$host_user, qdir))
+      error  = sprintf("the remote working directory %s does not exist on %s%s",
+                       qdir, config$host_user, said),
+      fix    = sprintf("create it on the remote host, verify with: ssh %s ls -ld %s",
+                       config$host_user, qdir))
   }
 }
 
@@ -208,8 +207,6 @@ launcher_error_message.ssh_launcher <- function(config, worker, status){
     worker = worker$name,
     target = sprintf("%s, port %d", config$host_user, config$host_port),
     error  = sprintf("ssh exited with status %d", status),
-    fix    = sprintf(paste("common causes are passwordless SSH not configured, host",
-                           "unreachable, R or flumen not installed on the remote host;",
-                           "check with: ssh %s 'Rscript -e \"library(flumen)\"'"),
+    fix    = sprintf("check with: ssh %s 'Rscript -e \"library(flumen)\"'",
                      config$host_user))
 }

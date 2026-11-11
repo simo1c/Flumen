@@ -427,14 +427,9 @@ def main():
                 shown = present[:5]
                 if len(present) > 5:
                     shown = shown + [f"and {len(present) - 5} more"]
-                what = (f"{len(present)} file(s) matching it already exist"
-                        if is_dyn else "it already exists")
                 _preexisting_err = (
-                    f"instance '{task_id}' declares the output '{f}', but {what} before the "
-                    f"task runs, so what the task produced could not be told from what was "
-                    f"already there and a consumer might read stale data: {', '.join(shown)}. "
-                    f"Fix: remove the file(s) or write to another path; a task cannot "
-                    f"overwrite its own previous run's outputs.")
+                    f"instance '{task_id}' output '{f}' already exists: "
+                    f"{', '.join(shown)}. Fix: remove it or write to another path.")
                 break
             if _preexisting_err is not None:
                 print(f"[WR_ERR:{task_id}] {_preexisting_err}", file=sys.stderr, flush=True)

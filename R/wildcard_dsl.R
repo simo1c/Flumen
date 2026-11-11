@@ -28,21 +28,16 @@ check_object_wildcard_names <- function(values, wc_name, was_atomic = FALSE){
   if(was_atomic)
     stop(flumen_reject(
       call  = "new_wildcard()",
-      error = sprintf(paste("wildcard '%s' has an empty value, and an atomic value is",
-                            "its own key, so the instance it would create has no identity"),
-                      wc_name),
-      fix   = paste("every value must be a non-empty string. Check for a blank line",
-                    "or a trailing separator in the source")), call. = FALSE)
+      error = sprintf("wildcard '%s' has an empty value", wc_name),
+      fix   = "every value must be a non-empty string"), call. = FALSE)
 
   stop(flumen_reject(
     call  = "new_wildcard()",
-    error = sprintf(paste("wildcard '%s' has %d object value(s) and %s; without names",
-                          "the only key left is the position, and a position is not an identity"),
+    error = sprintf("wildcard '%s' has %d object value(s) and %s",
                     wc_name, length(values),
                     if(is.null(nms)) "none of them is named"
                     else "at least one of them has no name"),
-    fix   = paste("name them, list(name1 = <obj>, name2 = <obj>); atomic values need no",
-                  "names, there the value is its own key")), call. = FALSE)
+    fix   = "name them, list(name1 = <obj>, name2 = <obj>)"), call. = FALSE)
 }
 
 ## Two entries sharing a wildcard KEY are the same instance: expansion is keyed
@@ -70,9 +65,7 @@ check_duplicate_wildcard_keys <- function(values, wc_name){
 
     stop(flumen_reject(
       call  = "new_wildcard()",
-      error = sprintf(paste("wildcard '%s' has %d entries named '%s' carrying DIFFERENT",
-                            "values, and expansion is keyed by the name, so only the",
-                            "first would become a task instance"),
+      error = sprintf("wildcard '%s' has %d entries named '%s' with different values",
                       wc_name, length(idx), k),
       fix   = "give each entry its own name"), call. = FALSE)
   }
@@ -227,11 +220,9 @@ update_param_wildcard_with_value <- function(par_list,
   if (!inherits(target_element, "output_req_list")) {
     stop(flumen_fail(
       call  = "update_param_wildcard_with_value()",
-      error = sprintf(paste("a value arrived from producer '%s' for parameter %d,",
-                            "whose container is a '%s' and not a list of constituents"),
+      error = sprintf("producer '%s' parameter %d: '%s' is not a list of constituents",
                       as.character(exe_id)[1], index, class(target_element)[1]),
-      fix   = paste("this is an engine invariant, not a workflow error:",
-                    "report the workflow and the producer id")), call. = FALSE)
+      fix   = "engine invariant, report the workflow and the producer id"), call. = FALSE)
   }
 
   if (!is.list(value)) value <- list(value)
@@ -320,11 +311,9 @@ update_param_wildcard_with_value <- function(par_list,
   if (length(sub_indices) == 0L) {
     stop(flumen_fail(
       call  = "update_param_wildcard_with_value()",
-      error = sprintf(paste("a value arrived from producer '%s' for parameter %d,",
-                            "and no constituent of that aggregation was waiting for it"),
+      error = sprintf("value from producer '%s' for parameter %d, no constituent waiting",
                       as.character(exe_id)[1], index),
-      fix   = paste("this is an engine invariant, not a workflow error:",
-                    "report the workflow and the producer id")), call. = FALSE)
+      fix   = "engine invariant, report the workflow and the producer id"), call. = FALSE)
   }
 
   target_element[[sub_indices[1]]] <- value

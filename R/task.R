@@ -453,7 +453,7 @@ new_script <- function(code = NULL, file = NULL){
       stop(flumen_reject(
         call  = "new_script()",
         error = sprintf("file not found: '%s'", file),
-        fix   = "check the path; it is read at construction time, on the master"),
+        fix   = "check the path, it is read on the master"),
         call. = FALSE)
     }
     code <- paste(readLines(file, warn = FALSE), collapse = "\n")

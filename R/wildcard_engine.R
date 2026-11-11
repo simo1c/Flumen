@@ -530,10 +530,9 @@ expand_parameters <- function(par_values, wildcard_list, par_expansion = NULL, g
     ## workflow, it is a property of the data, not an engine fault, and
     ## scheduler_fatal() reports it without the "internal error" prefix.
     stop(structure(class = c("flumen_user_error", "error", "condition"), list(
-      message = sprintf(paste("no file produced by the upstream task matches '%s', so this",
-                              "sample would get no instance and nothing grouped by it could",
-                              "run. Fix: check that the producer writes a file for every",
-                              "sample, or drop the sample from the wildcard"), pat),
+      message = sprintf(paste("no file produced by the upstream task matches '%s'.",
+                              "Fix: check that the producer writes a file for every sample."),
+                        pat),
       call = NULL)))
   }
   all_results <- all_results[!dropped]

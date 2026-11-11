@@ -100,25 +100,19 @@ arrow_unsupported_message <- function(type){
     named <- if(nzchar(base) && !identical(base, "wrapped"))
                paste0(" (that element is a ", base, ")") else ""
     return(list(
-      error = paste0("one element of the list returned by the producing task cannot be ",
-                     "sent to a Python task", named, "; Arrow carries atomic vectors, ",
-                     "matrices and data.frames"),
+      error = paste0("a list element cannot be sent to a Python task over Arrow", named),
       fix   = "flatten it, or return the element as its own output"))
   }
   switch(base,
     raw = list(
-      error = paste0("raw vectors cannot be sent to a Python task over Arrow, which ",
-                     "has no binary type"),
-      fix   = paste0("convert the bytes first (rawToChar()), or write them to a file ",
-                     "and pass the file")),
+      error = "raw vectors cannot be sent to a Python task over Arrow",
+      fix   = "convert the bytes first (rawToChar()), or write them to a file"),
     complex = list(
-      error = paste0("complex vectors cannot be sent to a Python task over Arrow, ",
-                     "which has no complex type"),
+      error = "complex vectors cannot be sent to a Python task over Arrow",
       fix   = "split into real and imaginary parts (Re()/Im())"),
     list(
-      error = paste0("an R object of class '", type, "' cannot be sent to a Python task; ",
-                     "Arrow carries atomic vectors, matrices and data.frames"),
-      fix   = "convert it before returning, or write it to a file and pass the file")
+      error = paste0("an R object of class '", type, "' cannot be sent over Arrow"),
+      fix   = "convert it before returning, or write it to a file")
   )
 }
 
@@ -134,10 +128,8 @@ arrow_non_tabular_message <- function(object){
   cls <- setdiff(class(object),
                  c("partial_aggregation", "aggregation", "expansion", "flumen_object"))[1]
   list(
-    error = paste0("an arrow ", cls, " is not a table; flumen carries an arrow Table ",
-                   "or RecordBatch as it is"),
-    fix   = paste0("convert it first, arrow::as_arrow_table(), or pass the values as ",
-                   "an ordinary R vector or data.frame"))
+    error = paste0("an arrow ", cls, " is not a table"),
+    fix   = "convert it first, arrow::as_arrow_table()")
 }
 
 ## The same words as one sentence, for the paths that hand the text to the master
@@ -286,9 +278,8 @@ from_arrow_binary_to_R <- function(data, data_type){
       ## Tested on the integer64 itself: after the conversion 2^53 + 1 is
       ## already 2^53 and the loss can no longer be seen.
       if(any(vapply(df[i64], function(x) any(abs(x) > 2^53, na.rm = TRUE), logical(1))))
-        stop(paste("an integer matrix holds values beyond 2^53, which an R matrix",
-                   "cannot represent exactly. Fix: return a DataFrame instead (int64",
-                   "columns arrive as integer64), or a float array"), call. = FALSE)
+        stop(paste("an integer matrix holds values beyond 2^53.",
+                   "Fix: return a DataFrame instead."), call. = FALSE)
       df[i64] <- lapply(df[i64], as.double)
     }
     m <- as.matrix(df)

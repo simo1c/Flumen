@@ -227,8 +227,7 @@ assert_fills_authorised_by_plan <- function(workflow, op_to_expand){
           stop(flumen_fail(
             call  = "result notify",
             task  = as.character(op$task_id)[1],
-            error = sprintf(paste("parameter '%s' was bound to producer instance '%s', which the",
-                                  "dependency map does not list among this task's parents"),
+            error = sprintf("parameter '%s' was bound to '%s', which is not a parent of this task",
                             as.character(par$name)[1], as.character(e)[1]),
             fix   = "this is an engine invariant, not a workflow error: report the workflow"),
             call. = FALSE)
@@ -274,13 +273,10 @@ op_to_expand <- if(!is.null(required_by)){
   if (length(socket_worker) == 0) {
     stop(flumen_fail(
       call  = "result notify",
-      error = sprintf(paste("worker '%s' is not in supervisor_info; the known workers are %s"),
+      error = sprintf("worker '%s' is not in supervisor_info, known workers: %s",
                       res_notify$Supervisor_ID,
                       paste(shQuote(sup_info$Supervisor_ID), collapse = ", ")),
-      fix   = paste0("the worker_id passed to start_worker() must match the 'name' given to ",
-                     "new_worker(), e.g. new_worker(name = \"ipc2\") is started with ",
-                     "Rscript -e 'flumen::start_worker(master_url = \"tcp://host:61000,61001\", ",
-                     "worker_id = \"ipc2\")'")), call. = FALSE)
+      fix   = "start_worker(worker_id = ) must match new_worker(name = )"), call. = FALSE)
   }
   
   out_req_list <- lapply(1:res_notify$n_outputs, function(out_instance){

@@ -99,8 +99,7 @@ launch_worker.default <- function(config, worker){
     worker = worker$name %||% "<unnamed>",
     error  = sprintf("no launch_worker() method for a launcher of class '%s'",
                      paste(class(config), collapse = "/")),
-    fix    = paste("use ssh_launcher(...), a plain function(worker), or define your",
-                   "own S3 class and method")), call. = FALSE)
+    fix    = "use ssh_launcher(...), a function(worker), or your own S3 method"), call. = FALSE)
 }
 
 

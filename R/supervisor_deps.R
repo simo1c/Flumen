@@ -96,11 +96,8 @@ update_co_local_dependency <- function(reg_tasks,
   .own <- output_req_for(actual_param, exe_id_to_req)
   if(is.null(.own)){
     return(list(reg_tasks = reg_tasks, wrapper_status = wrapper_status,
-                error = sprintf(paste(
-                  "parameter '%s' of wrapper '%s' has no constituent from producer '%s',",
-                  "yet a row of wrapper_status waits for it: the container and the rows",
-                  "disagree, which is an engine invariant, not a workflow error"),
-                  param_name, msg_sender, exe_id_to_req)))
+                error = sprintf("parameter '%s' of wrapper '%s' has no constituent from producer '%s'",
+                                param_name, msg_sender, exe_id_to_req)))
   }
   dyn_wild <- .own$dyn_wildcard
   ## The result instance asked for is a field of the constituent as well
@@ -137,7 +134,7 @@ update_co_local_dependency <- function(reg_tasks,
   .form <- declared_form(exe_object, w_param)
   if(is.na(.form)){
     return(list(reg_tasks = reg_tasks, wrapper_status = wrapper_status,
-                error = sprintf("parameter '%s' of wrapper '%s': the dispatch message declares no form (params_form) for it",
+                error = sprintf("parameter '%s' of wrapper '%s': no params_form in the dispatch message",
                                 param_name, msg_sender)))
   }
   is_multi <- .form %in% c("aggregate", "list")
@@ -174,13 +171,10 @@ update_co_local_dependency <- function(reg_tasks,
       .kept  <- tryCatch(as.character(unlist(lapply(res$parameter_values, function(v)
                   if(is.raw(v)) qs2::qs_deserialize(v) else v))), error = function(e) character(0))
       return(list(reg_tasks = reg_tasks, wrapper_status = wrapper_status,
-                  error = sprintf(paste(
-                    "parameter '%s' of task '%s': the template '%s' declared for producer '%s'",
-                    "matches %d of the %d file(s) the selectors let through (%s).",
-                    "A constituent is delivered whole or refused: the files it would have dropped are %s."),
+                  error = sprintf(paste("parameter '%s' of task '%s': template '%s' from",
+                                        "producer '%s' matches %d of %d files, dropping %s"),
                     param_name, if(!is.null(exe_object$task_id)) exe_object$task_id else msg_sender,
                     paste(dyn_wild, collapse = "|"), exe_id_to_req, n_out, n_in,
-                    paste(.files, collapse = ", "),
                     paste(setdiff(.files, .kept), collapse = ", "))))
     }
     note <- NULL
@@ -293,7 +287,7 @@ apply_p2p_resolution <- function(reg_tasks, wrapper_status,
   .form <- declared_form(reg_tasks[[wrapper_id]]$exe_object, w_param)
   if(is.na(.form)){
     return(list(reg_tasks = reg_tasks, wrapper_status = wrapper_status,
-                error = sprintf("parameter '%s' of wrapper '%s': the dispatch message declares no form (params_form) for it",
+                error = sprintf("parameter '%s' of wrapper '%s': no params_form in the dispatch message",
                                 par_name, wrapper_id)))
   }
 

@@ -225,8 +225,7 @@ execute_single_task <- function(exe_id, chosen_socket, workflow, exe_id_to_idx, 
       stop(flumen_fail(
         call  = "execute_single_task()",
         task  = task$task_id,
-        error = sprintf(paste("parameter '%s' is a static gather over task '%s' whose constituents",
-                              "were never bound at a producer's notify"),
+        error = sprintf("parameter '%s' is a static gather over '%s' with unbound constituents",
                         par_name, as.character(par_obj$value$task_id)[1]),
         fix   = "this is an engine invariant, not a workflow error: report the workflow"),
         call. = FALSE)
@@ -239,7 +238,7 @@ execute_single_task <- function(exe_id, chosen_socket, workflow, exe_id_to_idx, 
         stop(flumen_fail(
           call  = "execute_single_task()",
           task  = task$task_id,
-          error = sprintf("parameter '%s' holds a bare output_req; a resolved dependency is a list of constituents",
+          error = sprintf("parameter '%s' holds a bare output_req, not a list of constituents",
                           par_name),
           fix   = "this is an engine invariant, not a workflow error: report the workflow"),
           call. = FALSE)

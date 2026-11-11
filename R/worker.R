@@ -101,7 +101,7 @@ validate_resources <- function(resources, context = "resources") {
   if (length(unknown) > 0) {
     stop(flumen_reject(
       call  = context,
-      error = sprintf("unknown field(s) %s; allowed: %s",
+      error = sprintf("unknown field(s) %s, allowed: %s",
                       paste0("'", unknown, "'", collapse = ", "),
                       paste0("'", allowed_fields, "'", collapse = ", ")),
       fix   = "use one of the allowed fields"), call. = FALSE)
@@ -209,8 +209,7 @@ validate_worker <- function(worker) {
                               "the second, a file sent by the master will land in the first, and a",
                               "task will resolve its relative paths against the first"),
                         as.character(worker$launcher$cwd)[1], as.character(worker$root_path)[1]),
-      fix     = paste("leave ssh_launcher(cwd = NULL), which defaults to root_path, or set the two",
-                      "to the same directory; declared paths that are absolute are unaffected")),
+      fix     = "leave ssh_launcher(cwd = NULL), or set both to the same directory"),
       call. = FALSE)
   }
 
@@ -223,12 +222,10 @@ validate_worker <- function(worker) {
      nchar(worker$python_cmd) == 0){
     stop(flumen_reject(
       call  = sprintf("new_worker(name = '%s')", worker$name),
-      error = sprintf(paste("'python_cmd' must be a single non-empty string naming the",
-                            "Python interpreter, got %s"),
+      error = sprintf("'python_cmd' must be a non-empty string, got %s",
                       if(is.null(worker$python_cmd)) "NULL"
                       else deparse(worker$python_cmd)),
-      fix   = paste("it defaults to 'python3'; a common cause is Sys.getenv() on a",
-                    "variable that is not set, which returns \"\"")), call. = FALSE)
+      fix   = "it defaults to 'python3'"), call. = FALSE)
   }
 
   ## launcher must be NULL, a function, or an object with a class attribute
@@ -252,10 +249,8 @@ validate_worker <- function(worker) {
     if(!is.null(worker$launcher)){
       stop(flumen_reject(
         call  = sprintf("new_worker(name = '%s')", worker$name),
-        error = paste("'resources' on new_worker() is for local workers only, and this",
-                      "worker has a launcher"),
-        fix   = paste("declare them on the launcher for a remote worker, or set the",
-                      "launcher to NULL for a local one")),
+        error = "'resources' on new_worker() is for local workers only",
+        fix   = "declare them on the launcher, or set launcher = NULL"),
         call. = FALSE)
     }
     validate_resources(worker$resources,
@@ -271,10 +266,8 @@ validate_worker <- function(worker) {
      any(diff(as.integer(p)) != 1L)){
     stop(flumen_reject(
       call  = sprintf("new_worker(name = '%s')", worker$name),
-      error = paste("'ports' must be a contiguous integer range of length >= 2 with all",
-                    "values in [1024, 65535]"),
-      fix   = paste("new_worker(ports = 61100:61199); the first port is the data-request",
-                    "listen port, the rest are the peer-to-peer pool")), call. = FALSE)
+      error = "'ports' must be a contiguous range of >= 2 values in [1024, 65535]",
+      fix   = "new_worker(ports = 61100:61199)"), call. = FALSE)
   }
 
   ## self_host: a bare hostname or IP. NOT 'user@host' (that belongs in
@@ -434,8 +427,7 @@ new_worker <- function(name = NULL,
     stop(flumen_reject(
       call  = sprintf("new_worker(name = '%s')", name %||% "<unnamed>"),
       error = "'self_host' is reserved for remote workers, those with a launcher",
-      fix   = paste("remove it; a local worker takes the master's address from",
-                    "run_workflow(master_host = ...)")), call. = FALSE)
+      fix   = "remove it, a local worker takes the address from run_workflow(master_host = )"), call. = FALSE)
   }
 
   worker_object <- list(

@@ -42,10 +42,8 @@ new_dep <- function(task_id, ...){
       call  = sprintf("new_dep(\"%s\")", task_id),
       error = sprintf(paste("%d values were passed, and a dependency names ONE output",
                             "of '%s'"), length(values), task_id),
-      fix   = sprintf(paste("declare one input parameter per output, each with its own",
-                            "new_dep(\"%s\", ...), or depend on a pattern with",
-                            "new_dep(\"%s\", new_file_aggr(\"dir/{{any}}.ext\"))"),
-                      task_id, task_id)), call. = FALSE)
+      fix   = sprintf("declare one input parameter per output, each with new_dep(\"%s\", ...)",
+                      task_id)), call. = FALSE)
   }
 
   ## A dependency value naming SEVERAL literal paths is refused, before the
@@ -65,13 +63,10 @@ new_dep <- function(task_id, ...){
     if (!is.null(v) && inherits(v, "file_object") && length(as.character(v)) > 1L) {
       stop(flumen_reject(
         call  = sprintf("new_dep(\"%s\")", task_id),
-        error = sprintf(paste("the dependency value names %d paths, and a multi-path",
-                              "file value is an input construct, not a dependency"),
+        error = sprintf("the dependency value names %d paths, which is an input construct",
                         length(as.character(v))),
-        fix   = sprintf(paste("depend on a pattern, new_dep(\"%s\",",
-                              "new_file_aggr(\"dir/{{any}}.ext\")), or declare one input",
-                              "parameter per output, each with its own new_dep(\"%s\", ...)"),
-                        task_id, task_id)), call. = FALSE)
+        fix   = sprintf("depend on a pattern, new_dep(\"%s\", new_file_aggr(\"dir/{{any}}.ext\"))",
+                        task_id)), call. = FALSE)
     }
   }
 
@@ -88,9 +83,8 @@ new_dep <- function(task_id, ...){
         call  = sprintf("new_dep(\"%s\")", task_id),
         error = sprintf(paste("the dependency has no value, so it does not say which",
                               "output of '%s' to consume"), task_id),
-        fix   = sprintf(paste("new_dep(\"%s\", value = new_file(\"path/{wc}.ext\")) or",
-                              "new_dep(\"%s\", value = new_object(\"{{out}}\"))"),
-                        task_id, task_id)), call. = FALSE)
+        fix   = sprintf("new_dep(\"%s\", value = new_file(\"path/{wc}.ext\"))",
+                        task_id)), call. = FALSE)
     }
     dep <- list(
       task_id = task_id,
@@ -408,8 +402,7 @@ pre_staged <- function(x){
       call  = "pre_staged()",
       error = sprintf(paste("only new_file() or new_file_exp() values can be pre-staged,",
                             "got '%s'"), cls[1]),
-      fix   = paste("wrap a new_file() value; new_file_aggr(), new_object(), new_dep()",
-                    "and plain literals are not allowed")), call. = FALSE)
+      fix   = "wrap a new_file() value"), call. = FALSE)
   }
   attr(x, "to_transfer") <- FALSE
   x
@@ -568,10 +561,8 @@ collect_declared_output <- function(file, task_id){
     ## Dynamic pattern declared but matched ZERO files. Fail at the producer
     ## rather than propagate the literal pattern string downstream.
     return(list(files = character(0), error = sprintf(
-      paste0("task '%s' declared dynamic output pattern '%s' but produced no ",
-             "matching files in directory '%s'. Fix: check the tool actually ",
-             "wrote files matching the pattern (working directory, path prefix, ",
-             "extension)."),
+      paste0("task '%s' produced no files matching '%s' in '%s'. ",
+             "Fix: check the pattern and the working directory."),
       task_id, file, dir)))
 
   if(!file.exists(file))
@@ -579,9 +570,8 @@ collect_declared_output <- function(file, task_id){
     ## there before the body ran was refused at the start
     ## (wrapper_refuse_preexisting_outputs), so one present now was written by this run.
     return(list(files = character(0), error = sprintf(
-      paste0("task '%s' declared output '%s' but the task did not produce it ",
-             "(no such file exists after the task ran). Fix: check the tool ",
-             "actually wrote it (working directory, path prefix, file name)."),
+      paste0("task '%s' did not produce declared output '%s'. ",
+             "Fix: check the path and the working directory."),
       task_id, file)))
 
   warn_empty_declared_output(file, task_id)

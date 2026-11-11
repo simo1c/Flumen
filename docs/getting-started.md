@@ -788,7 +788,7 @@ locality-aware placement.
 | `the task declares neither input nor output` | both `input` and `output` are `NULL` | add at least one |
 | `the DAG is disconnected` | the task graph is not connected: an isolated task, or two chains each complete but never referencing each other | link the parts with a `new_dep`, or run them as separate workflows. A single-task workflow is accepted |
 | `dependency cycle in task_list, involving task_ids: ...` | a cycle, such as A depends on B depends on A | redesign the flow |
-| `unknown field(s) '<name>'; allowed: 'cpu', 'mem', 'gpu', 'tags'` | a field outside `{cpu, mem, gpu, tags}` | use only the allowed fields |
+| `unknown field(s) '<name>', allowed: 'cpu', 'mem', 'gpu', 'tags'` | a field outside `{cpu, mem, gpu, tags}` | use only the allowed fields |
 | `requires resources that no worker ... can satisfy` | the pool does not cover a task's `requires` | add a worker with matching `resources`, or relax `requires` |
 | `'self_host' is reserved for remote workers` | `self_host = ...` on a local worker (`launcher = NULL`) | remove it (locals inherit `master_host` from `run_workflow`) |
 | warning `does not exist on the master` | `new_file("literal/path")` is transferred by default but the file is missing on the master | stage it on the master, wrap it in `pre_staged()` if it is on the worker, or use a wildcard if the path is dynamic |
@@ -797,7 +797,7 @@ locality-aware placement.
 | `new_dep(task_id = 'X', value = '<v>') matches no output of 'X'` | the `new_dep` `value` does not match any of the producer's `new_output` patterns (typo / producer renamed) | align the consumer pattern with one of the producer's outputs |
 | shell task fails with `status 127`, every binary present | the `\<newline>` pitfall, where R single-quoted strings eat the backslash | one command per line, or R raw strings `r"(...)"`, or `new_cmd()` |
 | `[shell op X] cannot consume parameter 'Y' as data.frame` (or matrix/array/raw/...) | a shell task received a complex object from an upstream R/Python task | have the upstream task write a file (`.tsv`/`.rds`/`.parquet`), and the shell task consumes the path |
-| `'ports' must be a contiguous integer range ... in [1024, 65535]` | a non-contiguous range, a value out of range, or fewer than 2 ports | pass e.g. `61100:61199` (worker) / `61000:61099` (master) |
+| `'ports' must be a contiguous range of >= 2 values in [1024, 65535]` | a non-contiguous range, a value out of range, or fewer than 2 ports | pass e.g. `61100:61199` (worker) / `61000:61099` (master) |
 | `'ports' has N ports but K remote worker(s) need M` | `run_workflow(ports=...)` too small: it needs 1 shared notify port + 2 (control + terminate) per remote worker, i.e. `1 + 2*K` | widen `run_workflow(ports = ...)` |
 | `overlapping TCP port ranges: 'w1' A..B and 'w2' C..D` | two workers on one host (or the master + a co-located worker) overlap | shift one worker's `new_worker(ports = ...)` so the ranges are disjoint |
 | `peer-to-peer port pool (...) exhausted` | a worker's transfer pool is too small for its concurrency | widen `new_worker(ports = ...)` or lower `n_concurrent_task` |

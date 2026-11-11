@@ -1263,18 +1263,16 @@ check_dead_wrappers <- function(state){
     type       <- if(!is.null(exe_object$type)) exe_object$type else "<unknown>"
 
     hint <- if(connected)
-      paste0(" Fix: check the worker log and the machine's system log (the",
-             " out-of-memory killer is the usual cause).")
+      " Fix: check the worker log and the system log, often the OOM killer."
     else if(identical(type, "python"))
-      paste0(" Fix: check that '", cmd, "' has pyarrow, pandas, numpy and pynng;",
-             " its own error is in the worker log.")
+      paste0(" Fix: check that '", cmd, "' has pyarrow, pandas, numpy and pynng.")
     else
-      paste0(" Fix: see the worker log for the command's own error.")
+      " Fix: see the worker log for the command's own error."
 
     when <- if(connected) "while running the task" else "before connecting"
 
     to_log(paste0("Wrapper ", op_name, " (pid ", pid, ") exited with status ", status,
-                  " ", when, "; reporting it instead of waiting."), state$worker_name)
+                  " ", when, "."), state$worker_name)
 
     state$socket_list  <- close_socket(state$socket_list, op_name)
     state$message_list <- close_message(state$message_list, op_name)
@@ -1368,8 +1366,7 @@ check_stalled_transfers <- function(state){
           "no data arrived from '", peer, "' for ", round(secs), "s while fetching parameter '",
           if(is.null(wt$par_name)) "<unknown>" else wt$par_name,
           "' (output of ", msg_id, "), after ", now_seen, " chunk(s). ",
-          "Fix: if a pause this long is expected, raise FLUMEN_STALLED_TRANSFER_SECS in the ",
-          "shell that launches the run; setting it on this node has no effect."))
+          "Fix: raise FLUMEN_STALLED_TRANSFER_SECS on the master."))
     }
   }
   invisible(NULL)

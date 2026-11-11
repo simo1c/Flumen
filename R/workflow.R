@@ -64,9 +64,7 @@ new_workflow <- function(workflow_id,
       stop(flumen_reject(
         call  = "new_workflow()",
         error = "the DAG is disconnected",
-        fix   = paste("link every task into a single graph with",
-                      "new_dep(task_id = \"<producer>\", value = ...),",
-                      "or run the parts as separate workflows")),
+        fix   = "link the tasks with new_dep(), or run the parts as separate workflows"),
         call. = FALSE)
     }
     if(!igraph::is_dag(DAG)){
@@ -74,17 +72,14 @@ new_workflow <- function(workflow_id,
         call  = "new_workflow()",
         error = sprintf("dependency cycle in task_list, involving task_ids: %s",
                         paste(shQuote(igraph::V(DAG)$name), collapse = ", ")),
-        fix   = paste("the graph must be acyclic; check the new_dep(task_id = ...)",
-                      "references")), call. = FALSE)
+        fix   = "the graph must be acyclic, check the new_dep() references"), call. = FALSE)
     }
   }else{
     if(length(unique(sapply(task_list, get_object_id))) > 1){
       stop(flumen_reject(
         call  = "new_workflow()",
         error = "the DAG is disconnected",
-        fix   = paste("link every task into a single graph with",
-                      "new_dep(task_id = \"<producer>\", value = ...),",
-                      "or run the parts as separate workflows")),
+        fix   = "link the tasks with new_dep(), or run the parts as separate workflows"),
         call. = FALSE)
     }
   }
