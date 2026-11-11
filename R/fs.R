@@ -7,7 +7,7 @@
 #' Declare a dependency on another task's output
 #'
 #' Links an input to the output of a previously defined task. Use inside
-#' [new_input()] to wire tasks together into a workflow DAG.
+#' [new_input()] to link tasks together into a workflow DAG.
 #'
 #' @param task_id Character. The `task_id` of the upstream task this input
 #'   depends on.

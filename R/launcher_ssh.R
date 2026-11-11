@@ -42,7 +42,7 @@
 #'         > /tmp/flumen_worker_<worker$name>.log 2>&1 < /dev/null & disown'
 #' }
 #'
-#' Requirements on the remote server: Unix-like (Linux/macOS/BSD/WSL),
+#' Requirements on the remote server: Unix-like,
 #' passwordless SSH (key-based), R + flumen package installed, and the
 #' `Rscript` binary reachable on `PATH` (or specified via `R_cmd`).
 #'

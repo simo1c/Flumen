@@ -11,9 +11,8 @@ new_script(code = NULL, file = NULL)
 strings are supported. Mutually exclusive with \code{file}.}
 
 \item{file}{Character. Path to a file containing the source code, resolved
-relative to the calling session's working directory. The contents are read
-at the time of this call, so later edits to the file have no effect.
-Mutually exclusive with \code{code}.}
+relative to the calling session's working directory. Mutually exclusive
+with \code{code}.}
 }
 \value{
 A character vector with class \code{script}.
@@ -68,7 +67,7 @@ new_script('
 \dontrun{
 # File-based: keeps long shell/R/Python sources in their own
 # syntax-highlighted file. The path is relative to getwd() and is read at
-# construction time, so the file has to exist already.
+# construction time.
 new_script(file = "scripts/rsem_quant.sh")
 }
 

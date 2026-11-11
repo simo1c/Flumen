@@ -84,10 +84,10 @@ This writes `test.Rds` in the working directory, containing
 
 ## Documentation
 
-- [Getting started](docs/getting-started.md): basic concepts to start with Flumen.
-- [A multi-language pipeline](docs/scrnaseq-annotation.md): a scRNA-seq 
+- [Getting started](https://github.com/simo1c/Flumen/blob/main/docs/getting-started.md): basic concepts to start with Flumen.
+- [A multi-language pipeline](https://github.com/simo1c/Flumen/blob/main/docs/scrnaseq-annotation.md): a scRNA-seq 
   pipeline across three machines with no shared filesystem.
-- [Flumen DSL](docs/FLUMEN_DSL.md): the complete reference and an 
+- [Flumen DSL](https://github.com/simo1c/Flumen/blob/main/docs/FLUMEN_DSL.md): the complete reference and an 
   LLM-friendly resource for automatic workflow construction.
 
 
@@ -97,4 +97,4 @@ This entry will be replaced by the published reference and its DOI.
 
 ## License
 
-Flumen is distributed under the [MIT license](LICENSE.md).
+Flumen is distributed under the [MIT license](https://github.com/simo1c/Flumen/blob/main/LICENSE.md).

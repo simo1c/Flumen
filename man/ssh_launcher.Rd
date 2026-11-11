@@ -63,7 +63,7 @@ ssh -f -n [-i <identity>] [-p <host_port>] \
         > /tmp/flumen_worker_<worker$name>.log 2>&1 < /dev/null & disown'
 }
 
-Requirements on the remote server: Unix-like (Linux/macOS/BSD/WSL),
+Requirements on the remote server: Unix-like,
 passwordless SSH (key-based), R + flumen package installed, and the
 \code{Rscript} binary reachable on \code{PATH} (or specified via \code{R_cmd}).
 }

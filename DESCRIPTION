@@ -11,7 +11,6 @@ License: MIT + file LICENSE
 URL: https://github.com/simo1c/Flumen
 BugReports: https://github.com/simo1c/Flumen/issues
 Encoding: UTF-8
-LazyData: false
 Depends: R (>= 4.0)
 Imports:
     Rcpp,

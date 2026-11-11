@@ -401,9 +401,8 @@ new_task_list <- function(task_list){
 #' @param code Character. Inline source code as a single string. Multi-line
 #'   strings are supported. Mutually exclusive with `file`.
 #' @param file Character. Path to a file containing the source code, resolved
-#'   relative to the calling session's working directory. The contents are read
-#'   at the time of this call, so later edits to the file have no effect.
-#'   Mutually exclusive with `code`.
+#'   relative to the calling session's working directory. Mutually exclusive
+#'   with `code`.
 #'
 #' @return A character vector with class `script`.
 #'
@@ -423,7 +422,7 @@ new_task_list <- function(task_list){
 #' \dontrun{
 #' # File-based: keeps long shell/R/Python sources in their own
 #' # syntax-highlighted file. The path is relative to getwd() and is read at
-#' # construction time, so the file has to exist already.
+#' # construction time.
 #' new_script(file = "scripts/rsem_quant.sh")
 #' }
 #'

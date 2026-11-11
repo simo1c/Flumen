@@ -276,7 +276,8 @@ from_arrow_binary_to_R <- function(data, data_type){
     rn <- if(".rownames" %in% names(df)) df[[".rownames"]] else NULL
     df[[".rownames"]] <- NULL
     ## An int64 column beyond the int32 range arrives as bit64::integer64, which
-    ## as.matrix() strips to its raw bits read as doubles: 3e9 reads as 1.5e-314.
+    ## as.matrix() strips to its raw bits read as doubles, turning a large count
+    ## into a number close to zero.
     ## A base matrix cannot hold integer64, so such columns become double, exact
     ## up to 2^53; beyond that a double would round, and the value is refused
     ## rather than changed.

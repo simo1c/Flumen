@@ -20,7 +20,7 @@ An object of class \code{dep_object}.
 }
 \description{
 Links an input to the output of a previously defined task. Use inside
-\code{\link[=new_input]{new_input()}} to wire tasks together into a workflow DAG.
+\code{\link[=new_input]{new_input()}} to link tasks together into a workflow DAG.
 }
 \examples{
 new_input(
