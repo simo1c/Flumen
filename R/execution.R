@@ -306,6 +306,46 @@ format_workflow_error <- function(status, err_info) {
                   status  = if(!is.null(err_info$status) && !is.na(err_info$status))
                               as.character(err_info$status))
   base <- flumen_block("Flumen workflow failed.", fields, nowrap = nowrap)
+  ## The error field can overflow the printed limit on its own: the startup and
+  ## connectivity reports carry the reachability matrix, which grows with the
+  ## worker count, and R then cuts the message with no marker at all. Keep whole
+  ## lines from the HEAD, where the summary and the first failures are, and say
+  ## how many were dropped. The budget is found by measuring the RENDERED block,
+  ## since each continuation line is indented to the label column. Nothing is
+  ## lost: sched_check_probe_phase() logs the full report line by line.
+  wl <- getOption("warning.length", 1000L)
+  if(nchar(base) > wl){
+    logdir   <- Sys.getenv("FLUMEN_LOG_DIR", "")
+    where    <- if(nzchar(logdir)) paste0("full report in ", logdir, "/",
+                                          log_file_name("Central scheduler"))
+                else "full report in the scheduler log"
+    in_lines <- unlist(strsplit(msg_txt, "\n", fixed = TRUE))
+    trimmed  <- function(k) paste(c(in_lines[seq_len(k)],
+                                    sprintf("[truncated: first %d of %d lines, %s]",
+                                            k, length(in_lines), where)),
+                                  collapse = "\n")
+    keep <- 0L
+    for(k in seq_along(in_lines)){
+      fields$error <- trimmed(k)
+      if(nchar(flumen_block("Flumen workflow failed.", fields, nowrap = nowrap)) > wl) break
+      keep <- k
+    }
+    if(keep > 0L) fields$error <- trimmed(keep)
+    else {
+      ## Not even the first line fits, so cut inside it: a marker alone would
+      ## announce the truncation without ever saying what failed.
+      n <- nchar(in_lines[1L])
+      repeat {
+        fields$error <- paste0(substr(in_lines[1L], 1L, n),
+                               sprintf("\n[truncated: first %d of %d bytes, %s]",
+                                       n, nchar(msg_txt), where))
+        if(n <= 80L ||
+           nchar(flumen_block("Flumen workflow failed.", fields, nowrap = nowrap)) <= wl) break
+        n <- as.integer(n * 0.8)
+      }
+    }
+    base <- flumen_block("Flumen workflow failed.", fields, nowrap = nowrap)
+  }
   stderr_str  <- f(err_info$stderr, "")
   if(nchar(stderr_str) > 0L){
     ## R's stop() truncates the printed condition message to getOption("warning.length")
@@ -322,7 +362,7 @@ format_workflow_error <- function(status, err_info) {
                                           log_file_name("Central scheduler"))
                 else "full stderr in the scheduler and worker logs"
       stderr_str <- paste0(
-        "[truncated: showing last ", budget, " of ", orig_n, " bytes -- ", where, "]\n...",
+        "[truncated: last ", budget, " of ", orig_n, " bytes, ", where, "]\n...",
         substr(stderr_str, orig_n - budget + 1L, orig_n))
     }
     fields$stderr <- stderr_str
@@ -348,6 +388,15 @@ format_resources <- function(resources) {
 ##   (1) missing or empty worker_list
 ##   (2) non-numeric or non-positive chunk_size
 ##   (3) task$requires declares resources that no worker in worker_list can satisfy
+## Workers the scheduler could not tell apart: it identifies each one by name
+## (supervisor_info$Supervisor_ID), so two sharing a name collide in its tables.
+## One source of truth for run_workflow(), which refuses them, and
+## preview_workflow(), which reports them without raising.
+duplicate_worker_names <- function(worker_list) {
+  nm <- vapply(worker_list, function(w) as.character(w$name), character(1))
+  unique(nm[duplicated(nm)])
+}
+
 validate_exec_args <- function(workflow, worker_list, chunk_size) {
 
   ## A worker_object is itself a list, so a forgotten list()
@@ -397,10 +446,7 @@ validate_exec_args <- function(workflow, worker_list, chunk_size) {
     }
   }
 
-  ## The scheduler identifies each worker by name (supervisor_info$Supervisor_ID),
-  ## so two workers sharing a name collide in its tables.
-  w_names <- vapply(worker_list, function(w) as.character(w$name), character(1))
-  dup_names <- unique(w_names[duplicated(w_names)])
+  dup_names <- duplicate_worker_names(worker_list)
   if(length(dup_names) > 0){
     stop(flumen_reject(
       call  = "run_workflow()",
@@ -525,7 +571,8 @@ setup_remote_worker_tcp <- function(worker_list, master_host, ports) {
         stop(flumen_reject(
           call  = "run_workflow()",
           host  = host,
-          error = sprintf("overlapping TCP port ranges: '%s' %d..%d and '%s' %d..%d",
+          ## The labels carry their own quoting, so the format adds none.
+          error = sprintf("overlapping TCP port ranges: %s %d..%d and %s %d..%d",
                           rs[[k - 1L]]$label, rs[[k - 1L]]$lo, rs[[k - 1L]]$hi,
                           rs[[k]]$label, rs[[k]]$lo, rs[[k]]$hi),
           fix   = "give them non-overlapping ranges in new_worker(ports = ...)"), call. = FALSE)
@@ -656,7 +703,7 @@ print_port_plan <- function(worker_list) {
                     function(w) as.integer(w$launcher$host_port %||% 22L), integer(1)))
     tgt <- if (compact) "every worker" else join(remote_hosts[is_ssh])
     lines <- c(lines, sprintf(
-      "  also needed, not a flumen port: SSH from the master to %s (port %s)",
+      "  SSH from the master to %s (port %s)",
       tgt, paste(ssh_ports, collapse = ",")))
   }
 

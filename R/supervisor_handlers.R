@@ -654,12 +654,12 @@ sup_handle_wrapper_ready <- function(msg, state){
           pat_req     <- if(inherits(par_req, "output_req_list") && length(par_req))
                            par_req[[1]]$dyn_wildcard else par_req$dyn_wildcard
           err_msg <- sprintf(
-            "supervisor '%s': dependency '%s' of task '%s' could not be resolved to a producer (producer exe_id=%s, address=%s, fetch=%s) -- no producer registered an output matching the dep pattern %s.",
-            state$worker_name, param_name, task_id_req,
+            "dependency '%s' of task '%s' has no producer matching %s (exe_id=%s, address=%s, fetch=%s)",
+            param_name, task_id_req,
+            if(!is.null(pat_req) && nzchar(pat_req)) shQuote(pat_req) else "(pattern not recorded)",
             if(is.na(exe_id_to_req)) "NA" else exe_id_to_req,
             if(is.na(sup_to_req)) "NA" else sup_to_req,
-            if(is.na(.fetch)) "NA" else .fetch,
-            if(!is.null(pat_req) && nzchar(pat_req)) shQuote(pat_req) else "(pattern not recorded)")
+            if(is.na(.fetch)) "NA" else .fetch)
           to_log(paste0("DEPENDENCY UNRESOLVED: ", err_msg), state$worker_name)
           send_error_notify_to_scheduler(state, task_id = task_id_req, exe_id = msg_sender, message = err_msg)
           next
@@ -742,7 +742,7 @@ sup_handle_wrapper_ready <- function(msg, state){
             free_ports <- setdiff(state$p2p_port_pool, state$p2p_busy_ports)
             if(length(free_ports) == 0L){
               err_msg <- sprintf(
-                "[flumen] worker '%s': peer-to-peer port pool (%d..%d, %d ports) exhausted -- %d transfer(s) in flight. Widen new_worker(ports = ...) or lower n_concurrent_task.",
+                "worker '%s': peer-to-peer port pool (%d..%d, %d ports) exhausted, %d in flight. Fix: widen new_worker(ports = ...).",
                 state$worker_name, min(state$p2p_port_pool), max(state$p2p_port_pool),
                 length(state$p2p_port_pool), length(state$p2p_busy_ports))
               to_log(paste0("P2P POOL EXHAUSTED: ", err_msg), state$worker_name)

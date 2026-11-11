@@ -272,7 +272,7 @@ test_that("G9 - a forgotten list() is caught at the entry point", {
   expect_error(
     new_workflow(workflow_id = "G9", desc = "d",
                  task_list = list(task, "oops"), wildcard_list = list()),
-    regexp = "must contain only tasks built with"
+    regexp = "use[[:space:]]+new_R_task"
   )
   expect_error(run_workflow(wf, worker_list = list(worker, 42)),
                regexp = "must contain only workers built with")
@@ -308,7 +308,7 @@ test_that("G11 - a fanned-out task cannot write all instances to one file", {
   expect_error(
     new_workflow(workflow_id = "G11", desc = "d",
                  task_list = list(mk(new_file("fixed.txt"))), wildcard_list = wl),
-    regexp = "contains no wildcard"
+    regexp = "contains[[:space:]]+no[[:space:]]+wildcard"
   )
 
   ## A static wildcard gives each instance its own path.
@@ -325,7 +325,7 @@ test_that("G11 - a fanned-out task cannot write all instances to one file", {
   expect_error(
     new_workflow(workflow_id = "G11", desc = "d",
                  task_list = list(mk(new_file("`d/`{{any}}"))), wildcard_list = wl),
-    regexp = "carries no static wildcard"
+    regexp = "no[[:space:]]+static[[:space:]]+wildcard"
   )
   ## Putting the static wildcard in the path gives each instance its own
   ## namespace, and the dynamic part is then free to be bound at run time.

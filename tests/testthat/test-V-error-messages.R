@@ -90,7 +90,7 @@ test_that("V6 — backticks in an R task explain that they are shell-only", {
     new_workflow("W", "d", list(new_R_task(
       task_id = "T", output = new_output(o = new_file("`d/`{{x}}.txt")),
       exec = new_script('f <- function() 1'))), wildcard_list = list()),
-    c("task : T", "SHELL-ONLY"), "V6")
+    c("task : T", "shell-only"), "V6")
 })
 
 test_that("V7 — self_host on a local worker names the worker and the alternative", {

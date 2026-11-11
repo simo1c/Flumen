@@ -53,23 +53,16 @@ build_reachability <- function(all_workers, registered, worker_reports = list(),
 }
 
 ## Per-edge-kind remediation hint for a failed edge, what to fix by direction.
-## When the failing p2p edge involves a worker co-located with the scheduler
-## (local_workers), dropping that local worker is also an option -- it removes
-## the master host from the P2P mesh entirely.
+## The exact ports are in the port plan printed at launch, so the hint points
+## there rather than repeating them on every failing edge.
 reachability_remediation <- function(kind, from, to, local_workers = character(0)){
-  plan_ref <- paste0("see the '[flumen] firewall' section of the port plan printed at launch ",
-                     "for the exact ports to open and an example ufw rule")
   switch(kind,
-    control = sprintf(paste0("is start_worker running on '%s'? otherwise the master's TCP ports ",
-                             "(run_workflow(ports=)) must be open and master_host reachable from '%s' -- %s"),
-                      from, from, plan_ref),
+    control = sprintf("check start_worker on '%s', and run_workflow(ports=), see the port plan",
+                      from),
     p2p = {
-      base <- sprintf(paste0("open '%s's peer-to-peer ports (new_worker(ports=)) to inbound TCP ",
-                             "from '%s' (firewall/route between their subnets) -- %s"), to, from, plan_ref)
+      base <- sprintf("open '%s' new_worker(ports=) to TCP from '%s', see the port plan", to, from)
       lw <- intersect(c(from, to), local_workers)
-      if(length(lw)) paste0(base, "; or run WITHOUT the local worker '", lw[1],
-                            "' (removes the master host from the P2P mesh)")
-      else base
+      if(length(lw)) sprintf("%s, or drop the local worker '%s'", base, lw[1]) else base
     },
     sprintf("check connectivity from '%s' to '%s'", from, to))
 }

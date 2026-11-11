@@ -67,11 +67,10 @@ if(!is.function(func)){
     "the task's exec body must END with the function to call, ",
     "but its last expression produced ",
     if(is.null(func)) "NULL" else paste0("an object of class '", paste(class(func), collapse = "/"), "'"),
-    ".\n  A statement written after the definition becomes the body's value and ",
-    "hides the function -- e.g.\n",
+    ".\n  A statement after the definition becomes the body's value, e.g.\n",
     "      g <- function(xs) paste(unlist(xs))\n",
     "      saveRDS(g, 'out.Rds')      # <- this is what flumen received\n",
-    "  Move such statements INSIDE the function, so the definition stays last:\n",
+    "  Move it INSIDE the function:\n",
     "      g <- function(xs) { res <- paste(unlist(xs)); saveRDS(res, 'out.Rds') }")
   to_log(paste0("[WR_ERR] ", err_msg), task_id)
   flumen:::send_error_message(task_id, s, chunk_size, err_msg)
@@ -229,11 +228,8 @@ result <- tryCatch({
   }
   for(.pn in names(par_list)){
     if(.flumen_unresolved(par_list[[.pn]]))
-      stop(sprintf(paste0("flumen: input '%s' was not resolved -- it still contains a ",
-                          "dependency template ({{...}}). A new_*_aggr gather over a ",
-                          "dynamic {{...}} output that could not be matched to a producer ",
-                          "leaves the template unsubstituted. Align the dep pattern with ",
-                          "the producer's output, or give that output a static name."), .pn))
+      stop(sprintf(paste0("input '%s' still contains an unresolved template ({{...}}). ",
+                          "Fix: align the dep pattern with the producer's output."), .pn))
   }
   ## Invoke the user function WITHOUT do.call(): do.call() splices each
   ## argument into the constructed call BY VALUE, which raises every

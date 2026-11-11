@@ -485,11 +485,8 @@ def main():
                     for _v in _strs(_pv):
                         if _re.search(r"\{\{[^}]+\}\}", _v):
                             raise ValueError(
-                                "flumen: input '%s' was not resolved -- it still contains the "
-                                "dependency template '%s'. A new_*_aggr gather over a dynamic "
-                                "{{...}} output that could not be matched to a producer leaves "
-                                "the template unsubstituted. Align the dep pattern with the "
-                                "producer's output, or give that output a static name." % (_pn, _v))
+                                "input '%s' still contains an unresolved template '%s'. "
+                                "Fix: align the dep pattern with the producer's output." % (_pn, _v))
                 result = func(**par_list)
 
                 # 7. Check type and serialize result. Skip the type check when
@@ -629,11 +626,9 @@ def main():
                         # language.
                         try:
                             if os.path.getsize(f_clean) == 0:
-                                _warn = (f"instance '{task_id}' declared output "
-                                         f"'{f_clean}' and produced it EMPTY "
-                                         f"(0 bytes). This is allowed -- an empty "
-                                         f"result can be legitimate -- but "
-                                         f"downstream tasks will read no data from it.")
+                                _warn = (f"instance '{task_id}' output '{f_clean}' is "
+                                         f"empty (0 bytes), downstream tasks will read "
+                                         f"no data from it.")
                                 print(f"[WR_WARN:{task_id}] {_warn}",
                                       file=sys.stderr, flush=True)
                                 ## ...and to the per-instance log, like the R and the

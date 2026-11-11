@@ -127,7 +127,7 @@ test_that("W8 — mixing _exp and non-_exp on the same wildcard is rejected", {
   expect_error(
     new_workflow("W8", "conflicting drivers", list(mixed),
                  wildcard_list = new_wildcard_list(s = c("a", "b"))),
-    regexp = "conflicting[[:space:]]+expansion[[:space:]]+drivers")
+    regexp = "conflicting[[:space:]]+expansion")
 })
 
 test_that("W9 — an empty-string value in a constructor is rejected", {

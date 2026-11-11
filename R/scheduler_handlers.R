@@ -603,8 +603,7 @@ sched_handle_result <- function(msg, state, recv_socket){
         sprintf("its dynamic file output '%s' carries nothing to tell them apart",
                 .pats[.hit[1L]])
       else
-        sprintf(paste0("its dynamic file outputs '%s' and '%s' overlap -- the first ",
-                       "pattern also accepts what the second one writes"),
+        sprintf("its dynamic file outputs '%s' and '%s' overlap",
                 .pats[.hit[1L]], .pats[.hit[2L]])
       ## Count the instances that share THIS pattern, not every instance of the
       ## task: the ones under another static binding resolve to a pattern of

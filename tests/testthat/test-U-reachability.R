@@ -103,7 +103,7 @@ test_that("per-kind remediation: control + p2p, with drop-local-worker hint", {
     worker_reports = list(lw = c(remote1 = FALSE)),  # lw -> remote1 p2p fail (lw is local)
     local_workers  = "lw")
   txt <- paste(flumen:::format_reachability(r), collapse = "\n")
-  expect_match(txt, "start_worker running")                            # control fix
-  expect_match(txt, "peer-to-peer ports")                             # p2p fix
-  expect_match(txt, "run WITHOUT the local worker 'lw'", fixed = TRUE) # local-worker p2p hint
+  expect_match(txt, "check start_worker on")                      # control fix
+  expect_match(txt, "new_worker(ports=)", fixed = TRUE)           # p2p fix
+  expect_match(txt, "drop the local worker 'lw'", fixed = TRUE)   # local-worker p2p hint
 })

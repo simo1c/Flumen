@@ -34,18 +34,18 @@ own_name_wf <- function(wl, wd = names(wl)[1]) {
 
 test_that("a value equal to the wildcard's own name is refused, in every form", {
   expect_error(own_name_wf(new_wildcard_list(cond = c("cond", "ctrl"))),
-               regexp = "wildcard's\\s+own\\s+name")
+               regexp = "its\\s+own\\s+name")
   expect_error(own_name_wf(new_wildcard_list(sample = "sample")),
-               regexp = "wildcard's\\s+own\\s+name")
+               regexp = "its\\s+own\\s+name")
   expect_error(own_name_wf(new_wildcard_list(cond = c("{cond}", "ctrl"))),
-               regexp = "wildcard's\\s+own\\s+name")
+               regexp = "its\\s+own\\s+name")
   ## the key of an object wildcard
   expect_error(own_name_wf(new_wildcard_list(new_wildcard("data",
                  list(data = data.frame(a = 1), d2 = data.frame(a = 2))))),
-               regexp = "wildcard's\\s+own\\s+name")
+               regexp = "its\\s+own\\s+name")
   ## the string value of a keyed wildcard
   expect_error(own_name_wf(new_wildcard_list(sample = list(S1 = "sample", S2 = "x"))),
-               regexp = "wildcard's\\s+own\\s+name")
+               regexp = "its\\s+own\\s+name")
 })
 
 test_that("values that only resemble the name are accepted", {

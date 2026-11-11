@@ -16,11 +16,11 @@ test_that("collect_declared_output takes every file the pattern matches, and exi
   expect_null(r$error)
   expect_setequal(basename(r$files), c("s1_a.txt", "s1_b.txt"))
   r2 <- flumen:::collect_declared_output(file.path(d, "s1_{{n}}.csv"), "T")
-  expect_match(r2$error, "produced no matching files")
+  expect_match(r2$error, "produced no files matching")
   r3 <- flumen:::collect_declared_output(file.path(d, "other.log"), "T")
   expect_null(r3$error); expect_identical(basename(r3$files), "other.log")
   r4 <- flumen:::collect_declared_output(file.path(d, "missing.log"), "T")
-  expect_match(r4$error, "no such file exists after the task ran")
+  expect_match(r4$error, "did not produce declared output")
   ## the snapshot-based predicates are gone
   expect_false(exists("static_output_produced", envir = asNamespace("flumen"), inherits = FALSE))
   expect_false(exists("output_changed", envir = asNamespace("flumen"), inherits = FALSE))

@@ -61,7 +61,7 @@ test_that("the co-local resolver uses the constituent's own template, whatever t
 test_that("a constituent that would be delivered empty is refused, not handed over", {
   out <- co_local_fixture("parts/s1_r2_{{n}}.txt")   ## the sibling's template
   expect_true(is.character(out$error))
-  expect_match(out$error, "matches 0 of the 2 file")
+  expect_match(out$error, "matches 0 of 2 file")
 })
 
 ## Stage 14: the template is a CHECK, not a filter. A template that accepts
@@ -71,7 +71,7 @@ test_that("a constituent that would be delivered empty is refused, not handed ov
 test_that("a constituent whose template drops some of the selected files is refused, not trimmed", {
   out <- co_local_fixture("parts/s1_r1_1{{n}}")      ## accepts parts/s1_r1_1.txt only
   expect_true(is.character(out$error))
-  expect_match(out$error, "matches 1 of the 2 file")
+  expect_match(out$error, "matches 1 of 2 file")
   expect_match(out$error, "parts/s1_r1_2.txt")
 })
 
@@ -161,7 +161,7 @@ test_that("update_param_wildcard_with_value refuses a container that is not a li
   pl <- list(obj = req("E1", "e.txt"))
   expect_error(flumen:::update_param_wildcard_with_value(pl, list(as.raw(1:3)), 1L,
                                                           is_arrow = FALSE, data_type = "vector", exe_id = "E1"),
-               "not a list of constituents")
+               "not\\s+a\\s+list\\s+of\\s+constituents")
   pl <- list(obj = flumen:::new_output_req_list(req("E1", "e.txt")))
   out <- flumen:::update_param_wildcard_with_value(pl, list(as.raw(1:3)), 1L,
                                                     is_arrow = TRUE, data_type = "vector", exe_id = "E1")

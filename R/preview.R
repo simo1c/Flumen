@@ -210,6 +210,16 @@ preview_workflow <- function(workflow, worker_list = NULL, master_host = NULL, p
                              inputs = sc$inputs, outputs = sc$outputs, runtime_exp = sc$runtime_exp)
   }
 
+  ## run_workflow() refuses duplicate names in validate_exec_args(); report them
+  ## here so the preview does not show a plan the run would reject. tryCatch:
+  ## worker_list is not class-checked here, and the preview must not raise.
+  if (!is.null(worker_list)) {
+    dups <- tryCatch(duplicate_worker_names(worker_list), error = function(e) character(0))
+    if (length(dups))
+      warns <- c(warns, sprintf("duplicate worker name(s): %s. run_workflow() will refuse this worker_list",
+                                paste(shQuote(dups), collapse = ", ")))
+  }
+
   cat(strrep("-", 64), "\n")
   warns <- unique(warns)
   if (length(warns)) { cat("WARNINGS:\n"); for (w in warns) cat("  [!]", w, "\n") }

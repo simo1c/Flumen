@@ -32,7 +32,7 @@ test_that("static-pattern object aggregation is rejected with a clear error", {
   ## silence an assertion that the words are still there.
   msg <- gsub("[[:space:]]+", " ", conditionMessage(wf))
   expect_match(msg, "static wildcard pattern")
-  expect_match(msg, "DYNAMIC name")
+  expect_match(msg, "\\{\\{name\\}\\}")     ## points at the dynamic form
   expect_match(msg, "new_file_aggr")          ## says where a static {wc} IS valid
   expect_match(msg, "\\{a\\}_\\{b\\}_v")      ## echoes the offending pattern
 })
