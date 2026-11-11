@@ -77,7 +77,7 @@ reachability_remediation <- function(kind, from, to, local_workers = character(0
 ## Render the matrix for the user: every edge, then a FAILURES summary of who
 ## can't reach whom. Returns a character vector (one line each) for to_log().
 format_reachability <- function(r){
-  out <- "[flumen] reachability check -- who reaches whom (from -> to):"
+  out <- "[flumen] reachability check - who reaches whom (from -> to):"
   if(nrow(r$edges))
     out <- c(out, vapply(seq_len(nrow(r$edges)), function(i){
       e <- r$edges[i, ]

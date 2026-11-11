@@ -116,14 +116,7 @@ run_workflow <- function(workflow,
   if(!dir.exists(log_dir)) dir.create(log_dir, recursive = TRUE)
   log_dir <- normalizePath(log_dir, mustWork = FALSE)
   message(sprintf("[flumen] log directory: %s", log_dir))
-  ## The task table is appended to, not rewritten, so a reader who opens it
-  ## mid-run meets the same instance on several lines. The message states the
-  ## reading rule and that the file is rewritten whole at teardown.
-  message(sprintf(paste0(
-    "[flumen] task table: %s\n",
-    "         one line per state change, so a task's current state is its LAST line\n",
-    "         (rewritten one-line-per-task when the run ends)"),
-    FLUMEN_TASK_TABLE_FILE))
+  message(sprintf("[flumen] task table: %s", FLUMEN_TASK_TABLE_FILE))
   .old_flumen_log_env <- Sys.getenv("FLUMEN_LOG_DIR", unset = NA_character_)
   Sys.setenv(FLUMEN_LOG_DIR = log_dir)
   on.exit({
@@ -572,7 +565,7 @@ print_port_plan <- function(worker_list) {
   is_remote_w <- vapply(worker_list, function(w) !is.null(w$launcher), logical(1))
 
   if (!any(is_remote_w)) {
-    message("[flumen] port plan: all-local workflow -- IPC sockets only, no TCP ports")
+    message("[flumen] port plan: local workflow - IPC sockets")
     return(invisible(NULL))
   }
 
@@ -619,7 +612,7 @@ print_port_plan <- function(worker_list) {
   compact  <- n_remote > PORT_PLAN_MAX_HOSTS
   rngs     <- vapply(worker_list[remote_idx], rng_of, character(1))
 
-  lines <- c("[flumen] port plan -- inbound TCP each host must accept", "")
+  lines <- c("[flumen] port plan - inbound TCP each host must accept", "")
 
   ## ---- master host(s): control from its workers, plus P2P if a local worker runs here
   for (mh in master_h) {

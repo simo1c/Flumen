@@ -148,7 +148,7 @@ preview_workflow <- function(workflow, worker_list = NULL, master_host = NULL, p
     if (!is.null(worker_list)) {
       ok <- Filter(function(w) worker_satisfies_requires(w, req), worker_list)
       elig <- if (length(ok)) paste(vapply(ok, function(w) w$name, character(1)), collapse=", ")
-              else "NONE -- no eligible worker!"
+              else "NONE - no eligible worker!"
       if (!length(ok))
         warns <- c(warns, sprintf("task '%s' has NO eligible worker for requires=%s.",
                    tid, format_resources(req)))
@@ -166,7 +166,7 @@ preview_workflow <- function(workflow, worker_list = NULL, master_host = NULL, p
       ## nothing here states how the axes combine.
       inst <- paste0(inst, sprintf("  [+ runtime: expands per %s]",
                                    paste0("{{", sc$runtime_exp, "}}", collapse = ", ")))
-    cat(sprintf("TASK '%s' [%s] -- %s\n", tid, type, inst))
+    cat(sprintf("TASK '%s' [%s] - %s\n", tid, type, inst))
     cat(sprintf("  workers: %s%s\n", elig, req_str))
     if (length(sc$inputs)) {
       cat("  inputs:\n")
@@ -225,7 +225,7 @@ preview_workflow <- function(workflow, worker_list = NULL, master_host = NULL, p
     if (is.null(master_host)) master_host <- detect_self_host()
     tryCatch(
       print_port_plan(setup_remote_worker_tcp(worker_list, master_host, ports)),
-      error = function(e) cat(sprintf("[flumen] port plan unavailable -- %s\n", conditionMessage(e)))
+      error = function(e) cat(sprintf("[flumen] port plan unavailable - %s\n", conditionMessage(e)))
     )
     cat("\n")
   }

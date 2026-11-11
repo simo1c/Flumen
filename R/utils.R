@@ -93,14 +93,14 @@ to_log <- function(msg, sender, log_file = log_file_name(sender)) {
     }
   }
 
-  ## On the very first successful write of a process, drop a one-liner on
-  ## stderr so the actual resolved path is observable from outside (the
-  ## run_workflow() console for the master / in-process scheduler;
-  ## /tmp/flumen_worker_*.log on remote supervisors via the ssh_launcher redirect).
+  ## Once per process, and into the log rather than onto the console: the entries
+  ## carry neither the pid nor the cwd, and an unexpected cwd is what misplaces a
+  ## log on a worker that has no FLUMEN_LOG_DIR.
   if(is.null(getOption("flumen_log_announced"))){
     options(flumen_log_announced = TRUE)
-    message("[to_log] writing to: ", log_dir, "  (pid=", Sys.getpid(),
-            ", sender=", sender, ", cwd=", getwd(), ")")
+    cat(paste0(timestamp, " - [", sender, "] log at ", log_dir,
+               "  (pid=", Sys.getpid(), ", cwd=", getwd(), ")\n"),
+        file = file.path(log_dir, log_file), append = TRUE)
   }
 
   cat(log_entry, file = file.path(log_dir, log_file), append = TRUE)

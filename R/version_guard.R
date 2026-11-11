@@ -38,7 +38,7 @@ check_worker_version <- function(worker_name, worker_version,
       "worker '%s' runs a different flumen build than the master.\n",
       "  master: %s\n",
       "  worker: %s\n",
-      "  A mixed run does not fail cleanly -- it delivers wrong data or hangs.\n",
+      "  A mixed run does not fail cleanly - it delivers wrong data or hangs.\n",
       "  Reinstall flumen %s on that worker, then run again."),
       worker_name, master_version, worker_version, master_version))
   }
