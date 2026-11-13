@@ -130,7 +130,8 @@ launcher_error_message <- function(config, worker, status) UseMethod("launcher_e
 launcher_error_message.default <- function(config, worker, status){
   flumen_launch_fail(
     worker = worker$name %||% "<unnamed>",
-    error  = sprintf("the launcher exited with status %d", status))
+    error  = sprintf("the launcher exited with status %d", status),
+    fix    = "check the launcher's own output, or define launcher_error_message()")
 }
 
 

@@ -1054,8 +1054,8 @@ init_sockets <- function(socket_list,
     ## supervisor_info.
     if(is.null(sock_res_path)){
       stop(flumen_reject(
-      call  = "init_sockets()",
-      error = "the scheduler requires sock_res_path"), call. = FALSE)
+        error = "the scheduler was started without its result socket",
+        fix   = "engine invariant, report the workflow"), call. = FALSE)
     }
     sock_res  <- nanonext::socket(protocol = "pull", listen = sock_res_path)
 
@@ -1083,7 +1083,7 @@ init_sockets <- function(socket_list,
         stop(flumen_reject(
           call  = "init_sockets()",
           error = sprintf("malformed master_url '%s'", master_url),
-          fix   = "the form is 'tcp://host:notify_port,ctrl_port'"), call. = FALSE)
+          fix   = "the form is 'tcp://host:61000,61001'"), call. = FALSE)
       }
       notify_port <- as.integer(pp[1])
       ctrl_port   <- as.integer(pp[2])
@@ -1101,8 +1101,8 @@ init_sockets <- function(socket_list,
       ## iterating over every sock_term_<name>.
       if(is.null(sock_res_path) || is.null(sock_ctrl_path) || is.null(sock_term_path)){
         stop(flumen_reject(
-      call  = "init_sockets()",
-      error = "a local supervisor requires sock_res_path, sock_ctrl_path and sock_term_path"), call. = FALSE)
+          error = "a local supervisor was started without its sockets",
+          fix   = "engine invariant, report the workflow"), call. = FALSE)
       }
       sock_res  <- nanonext::socket(protocol = "push", dial = sock_res_path)
       sock_ctrl <- nanonext::socket(protocol = "pair", dial = sock_ctrl_path)

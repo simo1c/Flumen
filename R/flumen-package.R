@@ -9,7 +9,7 @@
 #' @importFrom Rcpp sourceCpp
 #' @importFrom stats setNames
 #' @importFrom methods is
-#' @importFrom utils capture.output flush.console
+#' @importFrom utils capture.output
 #' @importFrom rlang %||%
 "_PACKAGE"
 

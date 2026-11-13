@@ -128,6 +128,10 @@ probe_remote_dir <- function(config, worker, remote_dir){
   if(identical(as.integer(probe$status), 0L)) return(NULL)
 
   stderr_txt <- tryCatch(trimws(rawToChar(probe$stderr)), error = function(e) "")
+  ## ssh prefixes its own name, which the block already carries in `target`.
+  ## Only the literal prefix is dropped: the colons inside ssh's own text
+  ## separate the host from the reason and are part of what it is saying.
+  stderr_txt <- sub("^ssh: ", "", stderr_txt)
   said <- if(nzchar(stderr_txt)) paste0(" Remote/ssh said: ", stderr_txt, ".") else ""
   qdir <- shQuote(remote_dir)
   if(identical(as.integer(probe$status), 255L)){
@@ -135,7 +139,10 @@ probe_remote_dir <- function(config, worker, remote_dir){
     flumen_launch_fail(
       worker = worker$name,
       target = sprintf("%s, port %d", config$host_user, config$host_port),
-      error  = paste0("cannot reach the host over SSH.", said),
+      ## ssh's own stderr IS the diagnosis, and the block already names the
+      ## worker and the target, so it is the message. Our sentence is the
+      ## fallback for an ssh that failed without saying anything.
+      error  = if(nzchar(stderr_txt)) stderr_txt else "cannot reach the host over SSH",
       fix    = sprintf("check passwordless SSH, verify with: ssh %s echo ok",
                        config$host_user))
   } else {

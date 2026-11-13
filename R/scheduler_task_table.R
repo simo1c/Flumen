@@ -273,7 +273,7 @@ op_to_expand <- if(!is.null(required_by)){
   if (length(socket_worker) == 0) {
     stop(flumen_fail(
       call  = "result notify",
-      error = sprintf("worker '%s' is not in supervisor_info, known workers: %s",
+      error = sprintf("worker '%s' is not among the registered workers, known: %s",
                       res_notify$Supervisor_ID,
                       paste(shQuote(sup_info$Supervisor_ID), collapse = ", ")),
       fix   = "start_worker(worker_id = ) must match new_worker(name = )"), call. = FALSE)

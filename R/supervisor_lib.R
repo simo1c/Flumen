@@ -265,9 +265,8 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
   .uuids <- reg_tasks_wrapper$exe_object$par_uuids
   .form  <- reg_tasks_wrapper$exe_object$params_form
   if(is.null(.form) || !all(.uuids %in% names(.form))){
-    stop(sprintf(paste("task '%s': the dispatch message declares no form (params_form) for %s.",
-                       "The scheduler and this worker come from different builds of flumen:",
-                       "reinstall the same package everywhere."),
+    stop(sprintf(paste("task '%s': the dispatch message declares no form for %s.",
+                       "Fix: reinstall the same flumen build everywhere."),
                  reg_tasks_wrapper$exe_object$task_id,
                  if(is.null(.form)) "any parameter"
                  else paste(shQuote(setdiff(.uuids, names(.form))), collapse = ", ")),
@@ -325,9 +324,8 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
   output_auto_mkdir <- reg_tasks_wrapper$exe_object$output_auto_mkdir
   if(is.null(output_auto_mkdir) ||
      length(output_auto_mkdir) != length(output_files)){
-    stop(sprintf(paste("task '%s': the task carries %s auto_mkdir flag(s) for %d declared output(s).",
-                       "The workflow was built by a different build of flumen:",
-                       "reinstall the same package everywhere."),
+    stop(sprintf(paste("task '%s': %s auto_mkdir flag(s) for %d declared output(s).",
+                       "Fix: reinstall the same flumen build everywhere."),
                  reg_tasks_wrapper$exe_object$task_id,
                  if(is.null(output_auto_mkdir)) "no" else as.character(length(output_auto_mkdir)),
                  length(output_files)), call. = FALSE)

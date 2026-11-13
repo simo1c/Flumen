@@ -125,7 +125,7 @@ run_workflow <- function(workflow,
   }, add = TRUE)
 
   worker_list <- setup_remote_worker_tcp(worker_list, master_host, ports)
-  print_port_plan(worker_list)
+  print_port_plan(worker_list, control_detail = FALSE)
 
   ## Refuse to start if another flumen instance already holds this run's master
   ## TCP ports (same / overlapping ports range). Fails fast BEFORE any ssh launch
@@ -594,7 +594,11 @@ setup_remote_worker_tcp <- function(worker_list, master_host, ports) {
 ## listens on the SAME range. With differing ranges they are grouped by range.
 PORT_PLAN_MAX_HOSTS <- 4L
 
-print_port_plan <- function(worker_list) {
+## `control_detail` prints the per-worker split of the master's control ports,
+## which is how a manually started worker builds its master_url. Useful from
+## preview_workflow(), where nothing is running yet; at launch the scheduler is
+## already blocking on startup_timeout, too late to act on it.
+print_port_plan <- function(worker_list, control_detail = TRUE) {
   is_remote_w <- vapply(worker_list, function(w) !is.null(w$launcher), logical(1))
 
   if (!any(is_remote_w)) {
@@ -638,14 +642,14 @@ print_port_plan <- function(worker_list) {
     if (lhi > llo) sprintf("%d-%d", llo, lhi) else as.character(llo)
   } else NA_character_
   join <- function(x) paste(unique(x), collapse = ", ")
-  rule <- function(range, from, what)
-    sprintf("       %-14s from %-38s %s", range, from, what)
+  rule <- function(range, from)
+    sprintf("       %-14s from %s", range, from)
 
   n_remote <- length(remote_idx)
   compact  <- n_remote > PORT_PLAN_MAX_HOSTS
   rngs     <- vapply(worker_list[remote_idx], rng_of, character(1))
 
-  lines <- c("[flumen] port plan - inbound TCP each host must accept", "")
+  lines <- c("[flumen] port plan - inbound TCP ports to open", "")
 
   ## ---- master host(s): control from its workers, plus P2P if a local worker runs here
   for (mh in master_h) {
@@ -659,9 +663,9 @@ print_port_plan <- function(worker_list) {
             else "master (scheduler)"
     src  <- if (compact) "every worker" else join(remote_hosts[sel])
     lines <- c(lines, sprintf("  %-16s %s", mh, lab),
-               rule(crng, src, "control: dispatch, results, terminate"))
+               rule(crng, src))
     if (has_local)
-      lines <- c(lines, rule(local_rng, src, "data transfer"))
+      lines <- c(lines, rule(local_rng, src))
     lines <- c(lines, "")
   }
 
@@ -673,7 +677,7 @@ print_port_plan <- function(worker_list) {
       if (length(srcs) == 0L) next   ## one remote, no local worker -> no inbound P2P
       lines <- c(lines,
                  sprintf("  %-16s worker '%s'", remote_hosts[k], remote_names[k]),
-                 rule(rngs[k], join(srcs), "data transfer"), "")
+                 rule(rngs[k], join(srcs)), "")
     }
   } else {
     peers <- if (has_local) "the master and every other worker" else "every other worker"
@@ -681,20 +685,22 @@ print_port_plan <- function(worker_list) {
       grp <- which(rngs == r)
       lead <- sprintf("  each of the %d worker(s) on %s, e.g. %s (worker '%s')",
                       length(grp), r, remote_hosts[grp[1]], remote_names[grp[1]])
-      lines <- c(lines, lead, rule(r, peers, "data transfer"), "")
+      lines <- c(lines, lead, rule(r, peers), "")
     }
   }
 
   ## ---- what is not a per-host rule: port assignment, SSH, one translation
-  ctrl_detail <- if (compact)
-      sprintf("  control ports: notify %d shared, then two consecutive per worker from %d",
-              parsed[[1]]$notify, parsed[[1]]$notify + 1L)
-    else
-      sprintf("  control ports: notify %d shared; %s", parsed[[1]]$notify,
-              paste(vapply(seq_along(parsed), function(j)
-                sprintf("%s %d-%d", remote_names[j], parsed[[j]]$ctrl, parsed[[j]]$ctrl + 1L),
-                character(1)), collapse = ", "))
-  lines <- c(lines, ctrl_detail)
+  if (control_detail) {
+    ctrl_detail <- if (compact)
+        sprintf("  control ports: notify %d shared, then two consecutive per worker from %d",
+                parsed[[1]]$notify, parsed[[1]]$notify + 1L)
+      else
+        sprintf("  control ports: notify %d shared; %s", parsed[[1]]$notify,
+                paste(vapply(seq_along(parsed), function(j)
+                  sprintf("%s %d-%d", remote_names[j], parsed[[j]]$ctrl, parsed[[j]]$ctrl + 1L),
+                  character(1)), collapse = ", "))
+    lines <- c(lines, ctrl_detail)
+  }
 
   is_ssh <- vapply(worker_list[remote_idx],
                    function(w) inherits(w$launcher, "ssh_launcher"), logical(1))
@@ -713,7 +719,7 @@ print_port_plan <- function(worker_list) {
                                                        parsed[[j]]$ctrl + 1L)))
                if (max(cps) > min(cps)) sprintf("%d:%d", min(cps), max(cps))
                else as.character(min(cps)) }
-  lines <- c(lines, sprintf("  example rule:  ufw allow from %s to any port %s proto tcp",
+  lines <- c(lines, sprintf("  example port rule: ufw allow from %s to any port %s proto tcp",
                             remote_hosts[1], ex_ctrl))
 
   message(paste(lines, collapse = "\n"))

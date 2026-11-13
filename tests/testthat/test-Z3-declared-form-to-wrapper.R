@@ -19,9 +19,9 @@ test_that("the wrapper builds the container from the declared form, not from the
 
 test_that("a disagreement between the declaration and the message is refused, never guessed", {
   two <- list(slot("xs", 1, "numeric"), slot("xs", 2, "numeric"))
-  expect_error(flumen:::aggregate_params(two, forms = "bare"), "carries 2 slots")
+  expect_error(flumen:::aggregate_params(two, forms = "bare"), "message carries 2")
   one <- list(slot("xs", 1, "numeric"), slot("k", "a", "character"))
-  expect_error(flumen:::aggregate_params(one, forms = "bare"), "declares 1 parameter form")
+  expect_error(flumen:::aggregate_params(one, forms = "bare"), "1 parameter form")
 })
 
 ## Stage 14, the user's decision: one contract only. There is no "without a

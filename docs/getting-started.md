@@ -801,7 +801,7 @@ locality-aware placement.
 | `'ports' has N ports but K remote worker(s) need M` | `run_workflow(ports=...)` too small: it needs 1 shared notify port + 2 (control + terminate) per remote worker, i.e. `1 + 2*K` | widen `run_workflow(ports = ...)` |
 | `overlapping TCP port ranges: 'w1' A..B and 'w2' C..D` | two workers on one host (or the master + a co-located worker) overlap | shift one worker's `new_worker(ports = ...)` so the ranges are disjoint |
 | `peer-to-peer port pool (...) exhausted` | a worker's transfer pool is too small for its concurrency | widen `new_worker(ports = ...)` or lower `n_concurrent_task` |
-| `the remote working directory <dir> does not exist on <host>` (or `cannot reach the host over SSH`) | the SSH pre-flight check, where the launcher's `cwd` (defaulting to the worker's `root_path`) is missing on the remote (or SSH failed) | `ssh <host> mkdir -p <dir>`, or pass a valid `cwd`/`root_path`, and for SSH, check the passwordless key + reachability |
+| `the remote working directory <dir> does not exist on <host>` (or ssh's own message, e.g. `ssh: connect to host <host> port 22: Connection refused`) | the SSH pre-flight check, where the launcher's `cwd` (defaulting to the worker's `root_path`) is missing on the remote (or SSH failed) | `ssh <host> mkdir -p <dir>`, or pass a valid `cwd`/`root_path`, and for SSH, check the passwordless key + reachability |
 
 # Where to go next
 

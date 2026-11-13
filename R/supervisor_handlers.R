@@ -59,8 +59,6 @@ new_supervisor_state <- function(worker_name, is_remote, n_concurrent_task, chun
   st$p2p_busy_ports <- integer(0)
   st$p2p_recv_dial  <- list()
 
-  st$scheduler_connected <- FALSE
-
   st
 }
 
@@ -1093,10 +1091,6 @@ sup_step <- function(msg, recv_socket, state){
   msg_type   <- msg[[1]]$msg_type
 
   if(msg_sender == "central_scheduler"){
-    if(!state$scheduler_connected){
-      cat(paste0("[", state$worker_name, "] -  Connected to the scheduler\n")); flush.console()
-      state$scheduler_connected <- TRUE
-    }
     ## Evidence that the master is still there, for the dead-man switch in
     ## supervisor.R. ARMED only by a heartbeat, and deliberately not by any other
     ## message: a master too old to answer beats would otherwise start a clock that

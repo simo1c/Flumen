@@ -270,9 +270,9 @@ new_task <- function(task_id,
   if(missing(task_id) || is.null(task_id) || !is.character(task_id) ||
      length(task_id) != 1L || !nzchar(task_id)){
     stop(flumen_reject(
-      call  = "new_task()",
+      call  = "new_R_task() / new_python_task() / new_shell_task()",
       error = "'task_id' is required and must be a single non-empty string",
-      fix   = "new_task(task_id = \"align\", ...)"), call. = FALSE)
+      fix   = "new_R_task(task_id = \"align\", ...)"), call. = FALSE)
   }
 
   if(missing(par_list) || !is.list(par_list) || length(par_list) == 0L){

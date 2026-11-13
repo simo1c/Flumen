@@ -104,7 +104,8 @@ launch_local_and_register_supervisors <- function(worker_list,
           for(prev_pid in prev_pids) try(tools::pskill(prev_pid), silent = TRUE)
           stop(flumen_launch_fail(
             worker = worker_name,
-            error  = paste0("could not launch the supervisor: ", conditionMessage(e))),
+            error  = paste0("could not launch the supervisor: ", conditionMessage(e)),
+            fix    = "check that Rscript is on PATH on this machine"),
             call. = FALSE)
         }
       )
@@ -151,9 +152,9 @@ launch_local_and_register_supervisors <- function(worker_list,
 
     sup_info <- rbind(sup_info, new_entry)
     if(!is_remote){
-      message("[", worker_name, "] -  Executed with PID ", pid)
+      message("[", worker_name, "] Executed with PID ", pid)
     } else {
-      message("[", worker_name, "] -  Remote worker, master ctrl port ", master_port)
+      message("[", worker_name, "] Remote worker, master ctrl port ", master_port)
     }
   }
 

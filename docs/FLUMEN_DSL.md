@@ -1333,13 +1333,13 @@ run_workflow(workflow, worker_list = list(w), chunk_size = 1e8,
 `run_workflow()` then prints the port plan and blocks on `startup_timeout` (default 30s) waiting for the worker to dial in:
 
 ```         
-[flumen] port plan - inbound TCP each host must accept
+[flumen] port plan - inbound TCP ports to open
 
   192.168.1.10     master (scheduler)
-       61000-61002    from 10.0.0.7                               control: dispatch, results, terminate
+       61000-61002    from 10.0.0.7
 
   control ports: notify 61000 shared; remote1 61001-61002
-  example rule:  ufw allow from 10.0.0.7 to any port 61000:61002 proto tcp
+  example port rule: ufw allow from 10.0.0.7 to any port 61000:61002 proto tcp
 ```
 
 Remote side, in any R session. `master_url` needs two ports, the shared notify port and that worker's control port, comma-separated and in that order, exactly as the port plan above lists them:
@@ -1813,7 +1813,7 @@ run_workflow(
 | `'ports' has N ports but K remote worker(s) need M` | `run_workflow(ports=...)` is too small, because the master needs `1 + 2*K` ports, one shared notify port plus two per remote worker. | Widen `run_workflow(ports = ...)`. |
 | `overlapping TCP port ranges: '<a>' A..B and '<b>' C..D` | Two TCP-opening workers share a host, or one collides with the master's listen pool. See `ports` in section 3.4. It is never raised in an all-local workflow. | Shift one worker's `new_worker(ports = ...)` (or the `run_workflow(ports = ...)` pool) so the ranges are disjoint. |
 | `peer-to-peer port pool (...) exhausted` | A worker's P2P transfer pool (`new_worker(ports=...)[2:N]`) is too small for the number of concurrent cross-worker transfers. | Widen `new_worker(ports = ...)` or lower `n_concurrent_task`. |
-| `the remote working directory <dir> does not exist on <host>` (or `cannot reach the host over SSH`) | Pre-flight SSH check before launching a remote `ssh_launcher` worker: the launcher `cwd`, which defaults to the worker's `root_path`, is missing on the remote host, or SSH to the host failed. | Create the directory on the remote (`ssh <host> mkdir -p <dir>`), or pass a valid `cwd` or `root_path`. For the SSH variant, check the passwordless key and the reachability of the host. |
+| `the remote working directory <dir> does not exist on <host>` (or ssh's own message, e.g. `ssh: connect to host <host> port 22: Connection refused`) | Pre-flight SSH check before launching a remote `ssh_launcher` worker: the launcher `cwd`, which defaults to the worker's `root_path`, is missing on the remote host, or SSH to the host failed. | Create the directory on the remote (`ssh <host> mkdir -p <dir>`), or pass a valid `cwd` or `root_path`. For the SSH variant, check the passwordless key and the reachability of the host. |
 
 ## 9. Inspecting a run
 

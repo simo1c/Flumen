@@ -325,7 +325,8 @@ from_arrow_binary_to_R <- function(data, data_type){
   }else{
     stop(flumen_fail(
       call  = "serialize",
-      error = "object type not supported"), call. = FALSE)
+      error = sprintf("object type '%s' not supported", paste(data_type, collapse = ", ")),
+      fix   = "return a vector, matrix, data.frame or list"), call. = FALSE)
   }
   
   return(data)
@@ -443,8 +444,8 @@ aggregate_params <- function(input_list, forms) {
   data_types <- vapply(input_list, function(x) x$data_type, character(1))
   .names <- unique(data_names)
   if (length(forms) != length(.names))
-    stop(sprintf(paste("the dispatch message declares %d parameter form(s) for %d parameter(s):",
-                       "the supervisor and this wrapper come from different builds of flumen"),
+    stop(sprintf(paste("%d parameter form(s) declared for %d parameter(s).",
+                       "Fix: reinstall the same flumen build everywhere."),
                  length(forms), length(.names)), call. = FALSE)
   form_of <- setNames(as.character(forms), .names)
   is_arrows  <- vapply(input_list, function(x) isTRUE(x$is_arrow), logical(1))
@@ -482,8 +483,8 @@ aggregate_params <- function(input_list, forms) {
       output_list[[name]] <- extracted_data
     } else {
       if (length(extracted_data) != 1L)
-        stop(sprintf(paste("parameter '%s' is declared as one value but the message carries %d slots for it:",
-                           "the supervisor and this wrapper disagree on the contract"),
+        stop(sprintf(paste("parameter '%s' expects one value, the message carries %d.",
+                           "Fix: reinstall the same flumen build everywhere."),
                      name, length(extracted_data)), call. = FALSE)
       output_list[[name]] <- extracted_data[[1]]
     }

@@ -86,9 +86,8 @@ wrapper_prepare_outputs <- function(msg){
   ## supervisor of another build, and its parameter slots start where this
   ## wrapper reads a fixed field. Stop, rather than read one thing for another.
   if(length(msg) < N_FIXED_DISPATCH_FIELDS)
-    stop(sprintf(paste("the dispatch message carries %d fixed field(s), this wrapper expects %d.",
-                       "The supervisor and this wrapper come from different builds of flumen:",
-                       "reinstall the same package everywhere."),
+    stop(sprintf(paste("the dispatch message carries %d fixed field(s), expected %d.",
+                       "Fix: reinstall the same flumen build everywhere."),
                  length(msg), N_FIXED_DISPATCH_FIELDS), call. = FALSE)
   params_form <- decode_message_data(msg[[9]]$data, msg[[9]]$data_type, msg[[9]]$is_arrow)
 

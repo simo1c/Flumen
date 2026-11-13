@@ -28,8 +28,7 @@ detect_self_host <- function() {
   ## 2) Last-resort fallback
   warning(flumen_warn(
     call    = "detect_self_host()",
-    warning = paste("could not determine a network-reachable hostname, falling",
-                    "back to '127.0.0.1', which works only on one machine"),
+    warning = "could not determine a network-reachable hostname, using '127.0.0.1'",
     fix     = "pass self_host explicitly for a multi-host workflow"), call. = FALSE)
   "127.0.0.1"
 }
@@ -204,10 +203,8 @@ validate_worker <- function(worker) {
      !identical(as.character(worker$launcher$cwd)[1], as.character(worker$root_path)[1])){
     warning(flumen_warn(
       call    = sprintf("new_worker(name = '%s')", worker$name),
-      warning = sprintf(paste("the launcher starts the session in '%s' but the worker declares",
-                              "root_path = '%s'. A file received from a peer will be rooted under",
-                              "the second, a file sent by the master will land in the first, and a",
-                              "task will resolve its relative paths against the first"),
+      warning = sprintf(paste("the launcher starts in '%s' but root_path is '%s',",
+                              "so files land in two different places"),
                         as.character(worker$launcher$cwd)[1], as.character(worker$root_path)[1]),
       fix     = "leave ssh_launcher(cwd = NULL), or set both to the same directory"),
       call. = FALSE)
