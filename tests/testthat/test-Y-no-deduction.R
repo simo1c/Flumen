@@ -1,4 +1,4 @@
-## Stage 11: the supervisor deduces nothing about where a dependency's data
+## The supervisor deduces nothing about where a dependency's data
 ## is, how it is obtained, which constituent a row refers to, what template it
 ## carries, or in what form the parameter is delivered. The scheduler declares
 ## every one of those. This test keeps the removed deductions from returning:

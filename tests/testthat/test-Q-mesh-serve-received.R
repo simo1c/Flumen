@@ -1,4 +1,4 @@
-## Group Q — Mesh Stage 1: serve-from-received.
+## Group Q — serve-from-received.
 ## A worker that RECEIVED a P2P output (but did not produce it) re-caches it under a
 ## composite "exe_id#out_instance" key (complete_p2p_transfer) so it can later serve
 ## it to a peer; sup_handle_parameter_request falls back to that key when the producer
@@ -6,9 +6,9 @@
 ## and the serve fallback. The reconstruction mirrors get_result_from_msg; Q1 proves
 ## the FULL real-function data path (serve -> chunked transfer -> receive -> reconstruct)
 ## reproduces the producer's cache entry exactly. Pure in-process; the multi-worker
-## e2e is exercised only once Stage 3 routes a request to a holder.
+## e2e is exercised only once routing sends a request to a holder.
 
-## Mirror of the Stage-1 reconstruction (complete_p2p_transfer) for one received entry.
+## Mirror of the reconstruction in complete_p2p_transfer, for one received entry.
 recon_received <- function(data, data_type, is_arrow, elem_name) {
   if (data_type %in% c("file", "file_path")) {
     list(result = qs2::qs_deserialize(flumen:::raw_payload(data)),

@@ -1,4 +1,4 @@
-## Stage 13a: on the scheduler, as on the supervisor, a resolved dependency
+## On the scheduler, as on the supervisor, a resolved dependency
 ## has ONE shape, a list of constituents (output_req_list), a single producer
 ## included. The expansion engine must carry that list through untouched.
 

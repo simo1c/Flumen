@@ -1,9 +1,9 @@
-## Group R — Mesh Stage 2: holder visibility (data_received signal + holder index).
-## When a worker receives a COMPLETE output via P2P it re-caches it (Stage 1) and emits
+## Group R — holder visibility (data_received signal + holder index).
+## When a worker receives a COMPLETE output via P2P it re-caches it and emits
 ## a `data_received(exe_id, out_instance)` notification; the scheduler records the worker
 ## in its holder index (holders[["exe_id#out_instance"]]). These tests lock the wire
 ## round-trip of the signal and the index update / crash-prune logic. The index is inert
-## until Stage 3 routing reads it. Pure in-process.
+## until routing reads it. Pure in-process.
 
 minimal_state <- function() list(holders = new.env(hash = TRUE, parent = emptyenv()))
 
@@ -59,7 +59,7 @@ test_that("R4 — drop_holder_worker prunes a crashed worker from every entry", 
 
 test_that("R5 — holder key matches the supervisor's composite cache key format", {
   ## supervisor caches under paste0(exe_id, "#", out_instance_str); the scheduler keys
-  ## holders the same way, so a future Stage-3 lookup lines up with what was cached.
+  ## holders the same way, so a later routing lookup lines up with what was cached.
   exe <- "EXE9"; out_str <- "3"
   s <- flumen:::mark_holder(minimal_state(), exe, out_str, "w1")
   expect_true(paste0(exe, "#", out_str) %in% ls(s$holders))

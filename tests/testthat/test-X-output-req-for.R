@@ -1,4 +1,4 @@
-## Stage 11, group A: a constituent is read by the identity of its
+## A constituent is read by the identity of its
 ## producer, never by position, and a constituent that would be delivered
 ## empty is refused instead of handed to the wrapper.
 
@@ -64,10 +64,9 @@ test_that("a constituent that would be delivered empty is refused, not handed ov
   expect_match(out$error, "matches 0 of 2 file")
 })
 
-## Stage 14: the template is a CHECK, not a filter. A template that accepts
-## only some of the files the selectors let through is refused whole, with the
-## files it would have dropped named; it used to deliver the matching subset
-## with a log note.
+## The template is a CHECK, not a filter. A template that accepts only some of
+## the files the selectors let through is refused whole, with the files it
+## would have dropped named.
 test_that("a constituent whose template drops some of the selected files is refused, not trimmed", {
   out <- co_local_fixture("parts/s1_r1_1{{n}}")      ## accepts parts/s1_r1_1.txt only
   expect_true(is.character(out$error))
@@ -75,7 +74,7 @@ test_that("a constituent whose template drops some of the selected files is refu
   expect_match(out$error, "parts/s1_r1_2.txt")
 })
 
-## Stage 11, group C1: the launch decision reads the container, not only
+## The launch decision reads the container, not only
 ## the rows. A container with one constituent still waiting is pending; one
 ## whose constituents have all been replaced by values is not.
 test_that("container_pending lists exactly the constituents still waiting", {
@@ -106,7 +105,7 @@ test_that("declared_form reads the declared form by uuid and is NA when absent",
   expect_true(is.na(flumen:::declared_form(exe, 1L)))
 })
 
-## Stage 11, 3c: the container rebuilt from the slots must hold as many
+## The container rebuilt from the slots must hold as many
 ## constituents as the scheduler declared.
 test_that("constituent_count_mismatch names every parameter whose container disagrees with the declaration", {
   lst <- flumen:::new_output_req_list(req("E1", "a_{{n}}.txt"), req("E2", "b_{{n}}.txt"))
@@ -118,7 +117,7 @@ test_that("constituent_count_mismatch names every parameter whose container disa
   m <- flumen:::constituent_count_mismatch(exe)
   expect_length(m, 1L)
   expect_match(m, "'parts' declared 3 constituent\\(s\\), the container holds 2")
-  ## Stage 14, the user's decision: one contract only. A message without the
+  ## One contract only. A message without the
   ## declaration comes from another build and is reported as such, instead of
   ## being accepted with nothing to check it against.
   exe$params_n_constituents <- NULL
@@ -134,7 +133,7 @@ test_that("constituent_count_mismatch finds a container keyed by uuid (shell tas
   expect_length(flumen:::constituent_count_mismatch(exe), 0L)
 })
 
-## Stage 12: a dependency parameter is a list of constituents whatever their
+## A dependency parameter is a list of constituents whatever their
 ## number and whatever the siblings look like. The shape is a function of the
 ## parameter alone: a single producer gives a list of one, with or without a
 ## gathering sibling in the same message, and a plain value stays bare.
@@ -155,7 +154,7 @@ test_that("group_by_name builds a list of constituents for every dependency, a s
   expect_identical(g1$k, "x")
 })
 
-## Stage 12: the resolvers fill ONE shape. A container that is not a list of
+## The resolvers fill ONE shape. A container that is not a list of
 ## constituents is the invariant being false, reported as such.
 test_that("update_param_wildcard_with_value refuses a container that is not a list of constituents", {
   pl <- list(obj = req("E1", "e.txt"))

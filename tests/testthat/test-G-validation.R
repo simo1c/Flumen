@@ -257,7 +257,7 @@ test_that("G9 - a forgotten list() is caught at the entry point", {
   wf <- new_workflow(workflow_id = "G9", desc = "d",
                      task_list = list(task), wildcard_list = list())
 
-  ## task_object and worker_object are themselves lists, so these used to pass
+  ## task_object and worker_object are themselves lists, so these pass
   ## the length check and die deep inside with "$ operator is invalid for
   ## atomic vectors".
   expect_error(
@@ -288,7 +288,7 @@ test_that("G10 - duplicate worker names fail fast instead of timing out", {
   )
   mkw <- function(n) new_worker(name = n, n_concurrent_task = 1)
 
-  ## The scheduler keys workers by name, so duplicates used to collide silently
+  ## The scheduler keys workers by name, so duplicates would collide silently
   ## and surface only as a startup timeout blaming firewalls and ports.
   expect_error(run_workflow(wf, worker_list = list(mkw("w1"), mkw("w1"))),
                regexp = "duplicate worker name")
@@ -320,8 +320,7 @@ test_that("G11 - a fanned-out task cannot write all instances to one file", {
   ## A dynamic wildcard alone does NOT save a fanned-out task: the names are
   ## known only at run time, so every instance globs the same directory and
   ## claims whatever a sibling wrote while it ran -- samples merge in silence.
-  ## This assertion used to expect the workflow to build; the shared-namespace
-  ## guard refuses the shape instead, which is the behaviour we want.
+  ## The shared-namespace guard refuses the shape rather than letting it build.
   expect_error(
     new_workflow(workflow_id = "G11", desc = "d",
                  task_list = list(mk(new_file("`d/`{{any}}"))), wildcard_list = wl),

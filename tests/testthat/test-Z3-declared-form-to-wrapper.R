@@ -1,6 +1,6 @@
-## Stage 14, piece 2: the container a parameter is delivered in is DECLARED
-## to the wrapper (fixed dispatch field params_form) and read there, where the
-## wrapper used to count how many same-named slots the message carried.
+## The container a parameter is delivered in is DECLARED to the wrapper
+## (fixed dispatch field params_form) and read there, rather than inferred
+## from how many same-named slots the message carries.
 
 enc  <- function(v) qs2::qs_serialize(v)
 slot <- function(name, v, type) list(data_names = name, data_type = type, data = enc(v),
@@ -24,7 +24,7 @@ test_that("a disagreement between the declaration and the message is refused, ne
   expect_error(flumen:::aggregate_params(one, forms = "bare"), "1 parameter form")
 })
 
-## Stage 14, the user's decision: one contract only. There is no "without a
+## One contract only. There is no "without a
 ## declaration" case: a message that does not carry it comes from another build
 ## of flumen, and whoever reads it stops instead of falling back to the rule
 ## that counted the slots.

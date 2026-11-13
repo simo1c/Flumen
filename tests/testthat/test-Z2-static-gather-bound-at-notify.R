@@ -1,4 +1,4 @@
-## Stage 13b: a static gather over a producer is bound to its constituents
+## A static gather over a producer is bound to its constituents
 ## at the notify of each producer instance, and the container is the one
 ## shape (output_req_list), one constituent per path in the order of the
 ## paths, placeholders (exe_id NA) for the producers not yet finished.

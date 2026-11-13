@@ -1,5 +1,5 @@
-## Stage 14, piece 3: what a task produced is not deduced from a snapshot of
-## its output directories any more. A declared output that exists before the
+## What a task produced is not deduced from a snapshot of
+## its output directories. A declared output that exists before the
 ## task runs is refused (wrapper_refuse_preexisting_outputs, exercised end to
 ## end by tests/regression/test_rerun_dirty_dir.R and
 ## test_dynamic_ignores_pre_existing.R); after the run, everything the pattern

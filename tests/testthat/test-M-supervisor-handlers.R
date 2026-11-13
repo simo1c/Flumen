@@ -82,8 +82,8 @@ test_that("M4 - a wrapper that dies before connecting is reported, not waited on
   skip_if_not(file.exists("/usr/bin/false"))
 
   ## /usr/bin/false spawns fine and exits 1 immediately: the same shape as a
-  ## Python interpreter without pyarrow/pynng, which used to hang the run
-  ## forever because spawn succeeded and no wrapper ever dialed back.
+  ## Python interpreter without pyarrow/pynng. Without the guard this hangs
+  ## the run forever: the spawn succeeds and no wrapper ever dials back.
   wf <- new_workflow(
     workflow_id = "M4", desc = "d", wildcard_list = list(),
     task_list = list(new_python_task(
@@ -101,5 +101,5 @@ test_that("M4 - a wrapper that dies before connecting is reported, not waited on
   elapsed <- as.numeric(difftime(Sys.time(), t0, units = "secs"))
 
   expect_match(msg, "before connecting")
-  expect_lt(elapsed, 60)   ## it used to never return at all
+  expect_lt(elapsed, 60)   ## the call must return, not hang
 })

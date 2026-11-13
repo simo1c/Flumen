@@ -1,4 +1,4 @@
-## Group T2 — Mesh Stage 3: serving_count is an authoritative-set mirror that cannot
+## Group T2 — serving_count is an authoritative-set mirror that cannot
 ## leak. Locks the three historical leak paths (per-sample/select, coalescing overwrite,
 ## no-transfer resolve) via the two release triggers, plus crash cleanup and the
 ## no-double-decrement guarantee. Pure in-process (mirrors test-S setup).

@@ -1,4 +1,4 @@
-## Group S — Mesh Stage 3: least-connections source routing.
+## Group S — least-connections source routing.
 ## At consumer dispatch the scheduler rewrites each output_req's transport triple to a
 ## least-loaded peer holder (if any holds the data), else leaves it pointing at the
 ## producer (pre-mesh behaviour). These tests lock the selection policy, triple
