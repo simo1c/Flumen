@@ -266,9 +266,10 @@ open_remote_worker_channels <- function(supervisor_info,
       data_names = c("", "config"),
       data       = hs_data$data,
       is_arrow   = hs_data$data_type$is_arrow,
-      file_name  = hs_data$file_name,
-      chunk      = 1,
-      chunk_size = chunk_size
+      ## NOT chunked: this call sends one chunk and no loop follows it, and
+      ## sup_handle_handshake() decodes on arrival instead of accumulating. The
+      ## config carries only this worker's settings, so it is bounded anyway.
+      file_name  = hs_data$file_name
     )
     hs_aios[[as.character(rw_name)]] <- nanonext::send_aio(socks$ctrl, hs_msg$message, mode = "raw")
     to_log(paste0("Handshake sent to remote worker ", rw_name), "Central scheduler")
