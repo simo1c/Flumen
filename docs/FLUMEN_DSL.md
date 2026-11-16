@@ -132,7 +132,7 @@ new_shell_task(task_id, input = NULL, output = NULL, exec, requires = NULL)    #
 -   `"new_R_task(): 'exec' must be created with new_script()."`: a simple string was passed instead of `new_script(...)`.
 -   `"new_task(): the task declares neither input nor output."`: both `input` and `output` are `NULL`.
 -   `"new_task(): 'task_id' is required and must be a single non-empty string."`.
--   `"'requires': unknown field(s) 'foo'; allowed: 'cpu', 'mem', 'gpu', 'tags'."`.
+-   `"unknown field(s) 'foo', allowed: 'cpu', 'mem', 'gpu', 'tags'"`.
 
 #### 3.2.1 Script / Cmd
 
