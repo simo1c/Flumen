@@ -64,6 +64,10 @@ new_scheduler_state <- function(timeout, sleep_time,
   ## remote one enters it as soon as it has proved it can beat.
   st$last_heartbeat_at        <- list()
 
+  ## Last evidence of life: seeded at REGISTRATION and refreshed by any message.
+  ## last_heartbeat_at keeps beats alone, telling "never beat" from "went silent".
+  st$last_seen_at             <- list()
+
   ## structured error recorded by record_error_notify(); read by scheduler_teardown()
   ## and returned to run_workflow() so it can build the user-facing stop() message
   st$err_info                 <- NULL
@@ -220,6 +224,9 @@ sched_handle_data_received <- function(msg, state, recv_socket){
 sched_handle_worker_ready <- function(msg, state, recv_socket){
   sender <- msg[[1]]$sender
   to_log(paste0("READY received from ", sender), "Central scheduler")
+  ## The clock starts at registration: a worker whose first beat never arrives
+  ## must still be watched.
+  state$last_seen_at[[sender]] <- Sys.time()
   n_op_to_assign  <- decode_message_data(msg[[2]]$data, msg[[2]]$data_type, msg[[2]]$is_arrow)
   ## msg[[3]] = the worker's self_host (worker-initiated mode); "" for a local worker with
   ## no explicit self_host. No dispatch URL is exchanged: the master uses
@@ -724,9 +731,9 @@ sched_handle_error <- function(msg, state, recv_socket){
 ## running while its wrappers work, because they are separate processes. Silence
 ## is therefore distinguishable from being busy.
 ##
-## Watched: only workers whose beat has been HEARD at least once. A local worker
-## never beats (the send is gated on is_remote in supervisor.R), so it never
-## enters the map and there is no local/remote test here to get wrong.
+## Watched: every REMOTE worker that has registered, clocked from registration and
+## refreshed by any message. A local worker never beats, so it is not watched
+## here: the beat exists to keep a firewall flow warm, and IPC has none.
 ##
 ## Fires only while the worker HOLDS work, that is with a task in `dispatched`
 ## or `execution`: a silent idle worker stops asking for tasks and the others
@@ -734,13 +741,14 @@ sched_handle_error <- function(msg, state, recv_socket){
 ##
 ## 600 s (FLUMEN_WORKER_SILENCE_SECS), 30 missed beats.
 sched_check_worker_silence <- function(state){
-  if(!length(state$last_heartbeat_at) || is.null(state$task_table)) return(invisible(NULL))
+  if(!length(state$last_seen_at) || is.null(state$task_table)) return(invisible(NULL))
   lim <- suppressWarnings(as.numeric(Sys.getenv("FLUMEN_WORKER_SILENCE_SECS", "600")))
   if(!isTRUE(is.finite(lim)) || lim <= 0) return(invisible(NULL))
 
-  now <- Sys.time()
-  for(w in names(state$last_heartbeat_at)){
-    quiet <- as.numeric(difftime(now, state$last_heartbeat_at[[w]], units = "secs"))
+  now    <- Sys.time()
+  locals <- scheduler_local_workers(state)
+  for(w in setdiff(names(state$last_seen_at), locals)){
+    quiet <- as.numeric(difftime(now, state$last_seen_at[[w]], units = "secs"))
     if(quiet < lim) next
     held <- state$task_table$Exe_ID[!is.na(state$task_table$Worker) &
                                     state$task_table$Worker == w &
@@ -748,15 +756,25 @@ sched_check_worker_silence <- function(state){
     if(!length(held)) next
 
     ops <- state$task_table$Op_ID[match(held, state$task_table$Exe_ID)]
-    to_log(sprintf("WORKER SILENT: %s, %.0fs since its last heartbeat, holding %d task(s)",
-                   w, quiet, length(held)), "Central scheduler")
+    ## Never beat points at a blocked beat path, going silent at a dead worker.
+    ## Different causes, so different messages.
+    never <- is.null(state$last_heartbeat_at[[w]])
+    to_log(sprintf(
+      if(never) "WORKER NEVER BEAT: %s, silent %.0fs since registering, holding %d task(s)"
+      else      "WORKER SILENT: %s, %.0fs since its last heartbeat, holding %d task(s)",
+      w, quiet, length(held)), "Central scheduler")
     record_error_notify(state, new_error_notify(
       supervisor_ID = "central_scheduler",
       task_id = as.character(ops)[1],
       exe_id  = held[1],
       message = sprintf(
-        paste0("worker '%s' silent for %.0fs while holding %d task(s) (%s). ",
-               "Fix: raise FLUMEN_WORKER_SILENCE_SECS if a pause this long is expected."),
+        if(never)
+          paste0("worker '%s' has never sent a heartbeat and has been silent for %.0fs ",
+                 "while holding %d task(s) (%s). Fix: open the worker-to-master path for ",
+                 "the notify port, or raise FLUMEN_WORKER_SILENCE_SECS.")
+        else
+          paste0("worker '%s' silent for %.0fs while holding %d task(s) (%s). ",
+                 "Fix: raise FLUMEN_WORKER_SILENCE_SECS if a pause this long is expected."),
         w, quiet, length(held), paste(unique(as.character(ops)), collapse = ", "))))
     scheduler_teardown(state, 1)
   }
@@ -802,6 +820,11 @@ sched_check_startup_timeout <- function(state){
 ## startup-timeout / interrupt) signal the flumen_scheduler_exit condition.
 sched_step <- function(msg, recv_socket, state){
   msg_type <- msg[[1]]$msg_type
+  ## Any message is proof of life, not the beat alone. The supervisor does the
+  ## same with last_scheduler_contact once armed.
+  .snd <- msg[[1]]$sender
+  if(!is.null(.snd) && length(.snd) == 1L && !is.na(.snd) && nzchar(.snd))
+    state$last_seen_at[[.snd]] <- Sys.time()
   ## (a dead worker socket -> its recv AIO is an errorValue -> filtered out by the
   ## no_msg/AIO check in the main loop -> never reaches here)
   switch(msg_type,
