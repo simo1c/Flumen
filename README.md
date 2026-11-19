@@ -91,10 +91,6 @@ This writes `test.Rds` in the working directory, containing
   LLM-friendly resource for automatic workflow construction.
 
 
-## Citation
-
-This entry will be replaced by the published reference and its DOI.
-
 ## License
 
 Flumen is distributed under the [MIT license](https://github.com/simo1c/Flumen/blob/main/LICENSE.md).
