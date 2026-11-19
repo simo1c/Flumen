@@ -85,8 +85,8 @@ state$message_list <- socket_info$message_list
 
 if(!is_remote){
   ## Local worker: the scheduler IPC socket is already listening, so READY can go out
-  ## at once. EXECUTE_TASK arrives on sock_ctrl_<name>, push from the scheduler and
-  ## pull dial from this supervisor -- see init_sockets() in R/messaging.R.
+  ## at once. EXECUTE_TASK arrives on sock_ctrl_<name>, a PAIR the scheduler listens
+  ## on and this supervisor dials -- see init_sockets() in R/messaging.R.
   flag <- flumen:::send_ready_to_central_scheduler(
     state$socket_list[["sock_res"]],
     worker_name,

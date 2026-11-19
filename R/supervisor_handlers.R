@@ -1152,20 +1152,21 @@ supervisor_fatal <- function(e, state){
 }
 
 
-## A wrapper that starts but dies before it ever connects leaves the supervisor
-## listening on a PAIR socket nobody will dial. spawn_wrapper() only fails when
-## the command cannot be executed at all, so the guard at spawn time cannot
-## catch this.
+## A wrapper whose process is gone but whose result never arrived would leave the
+## supervisor waiting for ever. spawn_wrapper() only fails when the command cannot
+## be executed at all, so the guard at spawn time cannot catch this.
 ##
-## Three conditions must hold together, and each rules out a false positive:
+## Two gates, each ruling out a false positive:
 ##   - the wrapper's socket is still open. It is closed on the result path and on
 ##     the error path, so an open one means nothing was ever delivered.
 ##   - it still has wrapper_status rows. They are dropped once the wrapper
 ##     finishes, and all(logical(0)) is TRUE, so without this a completed wrapper
 ##     would look like a dead one.
-##   - every row is still "wait_ready". sup_handle_wrapper_ready() flips them all
-##     to "ready" the moment the wrapper connects, so this means nothing was ever
-##     sent: no result in flight, no chunked message mid-assembly to race with.
+##
+## `connected` then splits the two accidents, which are reported differently: a
+## wrapper still entirely in "wait_ready" never dialed back, cannot have a partial
+## result in flight and is reported at once, while one that had connected is held
+## for the quiescence check below.
 ##
 ## `state` is an environment (new_supervisor_state), so this mutates it in place
 ## and returns nothing, like the sup_handle_* handlers.

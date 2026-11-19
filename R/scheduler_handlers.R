@@ -401,9 +401,9 @@ sched_init_workflow <- function(state, workflow, exec_plan, chunk_size){
   state$startup_deadline   <- Sys.time() + state$startup_timeout
 
   ## per-worker sockets sock_ctrl_<name> (dispatch) and sock_term_<name> (dedicated
-  ## terminate channel) for each LOCAL supervisor: scheduler PUSH listens on the IPC
-  ## paths launch_local_and_register_supervisors() wrote into
-  ## supervisor_info$Socket_ctrl / $Socket_term, which the supervisor pulls from.
+  ## terminate channel) for each LOCAL supervisor: the scheduler PAIR-listens on the
+  ## IPC paths launch_local_and_register_supervisors() wrote into
+  ## supervisor_info$Socket_ctrl / $Socket_term, which the supervisor dials.
   ## Remote workers get theirs below (TCP listen).
   local_sup <- state$supervisor_info[is.na(state$supervisor_info$Port_base), ]
   for(li in seq_len(nrow(local_sup))){
@@ -421,8 +421,8 @@ sched_init_workflow <- function(state, workflow, exec_plan, chunk_size){
     state$message_list <- add_message(state$message_list, state$socket_list, term_nm)
   }
 
-  ## open TCP res/ctrl listen sockets for each remote worker + send its handshake (config
-  ## incl. its own P2P port range). See open_remote_worker_channels() in
+  ## open the TCP ctrl/term listen sockets for each remote worker + send its handshake
+  ## (config incl. its own P2P port range). See open_remote_worker_channels() in
   ## R/scheduler_channels.R.
   ch <- open_remote_worker_channels(state$supervisor_info, state$exec_plan$worker_list,
                                     state$socket_list, state$message_list,

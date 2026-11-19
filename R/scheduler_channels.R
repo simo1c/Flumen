@@ -54,8 +54,8 @@ launch_local_and_register_supervisors <- function(worker_list,
         p2p_pool_start <- "NULL"
         p2p_pool_end   <- "NULL"
       }
-      ## Per-worker dispatch channel (sock_ctrl_<name>): scheduler PUSH listen,
-      ## supervisor PULL dial. Each local supervisor gets its own unique IPC
+      ## Per-worker dispatch channel (sock_ctrl_<name>): scheduler PAIR listen,
+      ## supervisor PAIR dial. Each local supervisor gets its own unique IPC
       ## path; broadcasts are emulated by the scheduler iterating over every
       ## sock_ctrl_<name> (mirrors the existing pattern for remote workers).
       sock_ctrl_local <- paste0("ipc://", short_ipc_file())
@@ -161,14 +161,15 @@ launch_local_and_register_supervisors <- function(worker_list,
   return(sup_info)
 }
 
-## Open the TCP res/ctrl/term listen sockets for each remote worker and send its
+## Open the TCP ctrl/term listen sockets for each remote worker and send its
 ## handshake. Worker-initiated: the remote supervisor dials in to the master,
-## which PULL-listens on Port_base (result/READY uplink), PUSH-listens on
-## Port_base + 1 (control/dispatch) and PUSH-listens on Port_base + 2 (dedicated
-## terminate channel). The handshake carries the worker's config
+## which PAIR-listens on Port_base (control/dispatch, worker keepalive up) and on
+## Port_base + 1 (dedicated terminate channel). The results/READY uplink is not
+## opened here: sock_res is one scheduler-wide PULL listen on the shared notify
+## port, bound by init_sockets(). The handshake carries the worker's config
 ## including its own peer-to-peer port range (ports[1] = data-request listen,
-## ports[2:N] = transfer pool); NNG buffers the PUSH handshake until the
-## worker's PULL dial connects. Returns the updated socket_list/message_list.
+## ports[2:N] = transfer pool), and is sent before the worker's PAIR dials in, so
+## NNG keeps it pending until then. Returns the updated socket_list/message_list.
 ## (Local workers' IPC sock_ctrl is opened inline in sched_init_workflow(); only
 ## the remote side is non-trivial enough to extract.)
 open_remote_worker_channels <- function(supervisor_info, 
