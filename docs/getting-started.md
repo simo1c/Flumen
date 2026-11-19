@@ -771,9 +771,7 @@ any task:
 #>   task      : train
 #>   error     : requires resources that no worker in worker_list can satisfy:
 #>               cpu=8, mem=32G, gpu=1
-#>   fix       : add a worker that declares matching or greater resources, on
-#>               new_worker() for a local worker or on its launcher for a remote
-#>               one, or relax the requirement
+#>   fix       : add a worker with matching resources, or relax the requirement
 ```
 
 For a homogeneous pool, leave `requires = NULL` everywhere and
