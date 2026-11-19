@@ -20,7 +20,7 @@ inputs/outputs (e.g., \code{"{sample}"}), each value spawns a separate execution
 instance.
 }
 \examples{
-new_wildcard("sample", c("3019", "3022", "3023"))
+new_wildcard("sample", c("s1", "s2", "s3"))
 
 }
 \seealso{

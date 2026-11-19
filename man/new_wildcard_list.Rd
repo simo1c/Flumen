@@ -20,7 +20,7 @@ Aggregates wildcard definitions passed to \code{\link[=new_workflow]{new_workflo
 \examples{
 new_wildcard_list(
   ref    = "mmu",
-  sample = c("3019", "3022", "3023")
+  sample = c("s1", "s2", "s3")
 )
 
 }

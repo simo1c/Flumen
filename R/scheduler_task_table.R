@@ -307,7 +307,7 @@ op_to_expand <- if(!is.null(required_by)){
     ## value (new_dep(task, value=new_file(...))): par$value$value carries the
     ## concrete path produced by the expansion, and
     ## we match it against res_notify$dyn_wildcard so multi-instance producers
-    ## (e.g. alignment_1/_2/_3 emitting sam/3019.sam, sam/3022.sam, sam/3023.sam)
+    ## (e.g. alignment_1/_2/_3 emitting sam/s1.sam, sam/s2.sam, sam/s3.sam)
     ## land on the right consumer instance and not on every dep_object that
     ## happens to share the parent task_id.
     if(length(out_req_list) > 0 && length(op_to_expand) > 0){
