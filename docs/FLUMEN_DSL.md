@@ -1859,7 +1859,7 @@ The master sends the six that govern a worker's own behaviour in the handshake, 
 | Variable | Default | What it watches |
 |------------------------|------------------------|------------------------|
 | `FLUMEN_HEARTBEAT_SECS` | 20 | How often a remote worker sends its keepalive. Every threshold below must stay well above it. Change it only to make a test shorter. |
-| `FLUMEN_WORKER_SILENCE_SECS` | 600 | A worker that stopped answering while holding work. |
+| `FLUMEN_WORKER_SILENCE_SECS` | 600 | A worker that stopped answering, or that never answered since it registered, while holding work. The two cases are reported with different messages, because the first points at a dead worker and the second at a blocked worker-to-master path. |
 | `FLUMEN_SCHEDULER_SILENCE_SECS` | 600 | A worker whose scheduler stopped answering shuts itself down, instead of computing for a run no caller is collecting. |
 | `FLUMEN_STALLED_TRANSFER_SECS` + `FLUMEN_STALLED_TRANSFER_CHECKS` | 600 / 5 | A fetch from a peer that stopped sending. Measured as no new chunks, not as elapsed time, so a slow but progressing transfer is never touched. |
 | `FLUMEN_DEAD_WRAPPER_SECS` + `FLUMEN_DEAD_WRAPPER_CHECKS` | 30 / 5 | A task process that exited without delivering a result, the usual cause being the operating system's out-of-memory killer. |
