@@ -812,6 +812,6 @@ locality-aware placement.
     `?new_object_exp`, `?new_object_aggr`, `?new_file_exp`,
     `?new_file_aggr` cover declaring data flow, while `?ssh_launcher`
     and `?start_worker` cover remote setup.
--   [`FLUMEN_DSL.md`](FLUMEN_DSL.md) is the exhaustive reference (every
+-   [FLUMEN DSL](FLUMEN_DSL.md) is the exhaustive reference (every
     signature, every caveat, decision trees), kept in sync with the
     code.

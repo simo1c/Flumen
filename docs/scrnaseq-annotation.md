@@ -405,6 +405,6 @@ outputs, or run elsewhere.
 -   [Getting started](getting-started.md), the building blocks, the
     `{x}` / `{{x}}` rules, and resource pinning (`requires` /
     `resources`).
--   [`FLUMEN_DSL.md`](FLUMEN_DSL.md), the exhaustive reference.
+-   [FLUMEN DSL](FLUMEN_DSL.md), the exhaustive reference.
 -   `?new_shell_task`, `?new_R_task`, `?new_python_task`, `?new_dep`,
     `?new_file_aggr`, `?pre_staged`, `?ssh_launcher`, `?run_workflow`.
