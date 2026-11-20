@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "flumen: An R Workflow Manager for Distributed Bioinformatics without Centralized Storage"
+abstract: "Workflow manager for distributed bioinformatics with locality-aware
+  scheduling, cross-machine distribution via TCP, and multi-language tasks (R,
+  Python, shell). Task outputs travel directly from worker to worker, requiring
+  no centralized storage."
+authors:
+  - family-names: Caligola
+    given-names: Simone
+    email: s.caligola@gmail.com
+version: 1.0.0
+date-released: "2026-11-20"
+license: MIT
+repository-code: "https://github.com/simo1c/Flumen"
