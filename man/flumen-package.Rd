@@ -21,5 +21,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Simone Caligola \email{s.caligola@gmail.com}
 
+Authors:
+\itemize{
+  \item Vincenzo Bronte
+  \item Stefania Canè
+}
+
 }
 \keyword{internal}

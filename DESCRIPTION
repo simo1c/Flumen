@@ -3,7 +3,11 @@ Type: Package
 Title: An R Workflow Manager for Distributed Bioinformatics without Centralized Storage
 Version: 1.0.0
 Date: 2026-11-20
-Authors@R: person("Simone", "Caligola", email = "s.caligola@gmail.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Simone", "Caligola", email = "s.caligola@gmail.com",
+           role = c("aut", "cre")),
+    person("Vincenzo", "Bronte", role = "aut"),
+    person("Stefania", "Canè", role = "aut"))
 Description: Workflow manager for distributed bioinformatics with locality-aware scheduling, 
     cross-machine distribution via TCP, and multi-language
     tasks ('R', 'Python', shell). Uses 'Arrow' IPC for data transfer and 'NNG'

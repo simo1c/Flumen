@@ -10,6 +10,10 @@ authors:
   - family-names: Caligola
     given-names: Simone
     email: s.caligola@gmail.com
+  - family-names: Bronte
+    given-names: Vincenzo
+  - family-names: Canè
+    given-names: Stefania
 version: 1.0.0
 date-released: "2026-11-20"
 license: MIT
