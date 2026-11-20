@@ -9,11 +9,21 @@ abstract: "Workflow manager for distributed bioinformatics with locality-aware
 authors:
   - family-names: Caligola
     given-names: Simone
-    email: s.caligola@gmail.com
+    orcid: "https://orcid.org/0000-0002-9829-9527"
+    affiliation: "Section of Immunology, Department of Medicine, University of Verona"
   - family-names: Bronte
     given-names: Vincenzo
+    orcid: "https://orcid.org/0000-0002-3741-5141"
+    affiliation: "Section of Immunology, Department of Medicine, University of Verona"
   - family-names: Canè
     given-names: Stefania
+    orcid: "https://orcid.org/0000-0003-4324-4681"
+    affiliation: "Section of Immunology, Department of Medicine, University of Verona"
+keywords:
+  - workflow management system
+  - distributed bioinformatics
+  - peer-to-peer data transfer
+  - Apache Arrow
 version: 1.0.0
 date-released: "2026-11-20"
 license: MIT
