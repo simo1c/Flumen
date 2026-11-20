@@ -480,6 +480,12 @@ new_script <- function(code = NULL, file = NULL){
 #'
 #' @export
 new_cmd <- function(code){
+  if(missing(code) || is.null(code)){
+    stop(flumen_reject(
+      call  = "new_cmd()",
+      error = "'code' was not given",
+      fix   = "new_cmd(\"samtools sort in.bam\")"), call. = FALSE)
+  }
   class(code) <- c("cmd", "character", "vector")
   return(code)
 }

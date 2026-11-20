@@ -122,6 +122,12 @@ new_dep <- function(task_id, ...){
 #'   [pre_staged()].
 #' @export
 new_file <- function(file_path, auto_mkdir = TRUE){
+  if(missing(file_path) || is.null(file_path)){
+    stop(flumen_reject(
+      call  = "new_file()",
+      error = "'file_path' was not given",
+      fix   = "new_file(\"out/result.txt\")"), call. = FALSE)
+  }
   class(file_path) <- c("file_object", "file_path", "flumen_path", "character", "vector")
   ## auto_mkdir: stamp only when explicitly passed so the wrapper's default
   ## (auto-create parent dir, current behaviour) applies to unmarked files
@@ -281,6 +287,12 @@ new_object_aggr <- function(object = NULL, by = NULL){
 #'   See [new_file()] for the full semantics.
 #' @export
 new_file_exp <- function(object, auto_mkdir = TRUE){
+  if(missing(object) || is.null(object)){
+    stop(flumen_reject(
+      call  = "new_file_exp()",
+      error = "'object' was not given",
+      fix   = "new_file_exp(\"out/{sample}.txt\")"), call. = FALSE)
+  }
   class(object) <- c("expansion", "file_object", "file_path", "flumen_path", "character", "vector")
   if(!missing(auto_mkdir)) attr(object, "auto_mkdir") <- isTRUE(auto_mkdir)
   return(object)
@@ -333,6 +345,12 @@ new_file_exp <- function(object, auto_mkdir = TRUE){
 #'   See [new_file()] for the full semantics.
 #' @export
 new_file_aggr <- function(object, by = NULL, auto_mkdir = TRUE){
+  if(missing(object) || is.null(object)){
+    stop(flumen_reject(
+      call  = "new_file_aggr()",
+      error = "'object' was not given",
+      fix   = "new_file_aggr(\"out/{sample}.txt\")"), call. = FALSE)
+  }
   if(is.null(by)){
     class(object) <- c("aggregation", "file_object", "file_path", "flumen_path", "character", "vector")
   } else {
