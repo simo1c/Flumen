@@ -766,7 +766,7 @@ If you pass a pool with no GPU worker, the run stops before launching
 any task:
 
 ```r
-#> Flumen workflow rejected.
+#> Flumen run rejected.
 #>   call      : run_workflow()
 #>   task      : train
 #>   error     : requires resources that no worker in worker_list can satisfy:

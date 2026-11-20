@@ -1,6 +1,6 @@
 ## User-facing diagnostics: one shape for every message flumen prints.
 ##
-##   Flumen workflow rejected.
+##   Flumen declaration rejected.
 ##     call      : new_workflow()
 ##     task      : align
 ##     error     : <what happened>
@@ -96,7 +96,16 @@ wrap_keeping_calls <- function(txt, width){
 ## A message travelling to the master inside an error_notify is not built here: it
 ## arrives in the `error` field of flumen_fail()'s own block, so it stays one
 ## sentence ending in "Fix: ...", and a block would nest inside a block.
-flumen_reject <- function(...) flumen_block("Flumen workflow rejected.", list(...))
+## The `call` field already says what was refused, so the header is derived from
+## it: an invocation, a declaration, or an engine invariant (no `call` at all).
+flumen_reject <- function(...){
+  f <- list(...)
+  invocations <- c("run_workflow()", "start_worker()", "init_sockets()")
+  header <- if(is.null(f$call))             "Flumen internal error."
+            else if(f$call %in% invocations) "Flumen run rejected."
+            else                             "Flumen declaration rejected."
+  flumen_block(header, f)
+}
 
 flumen_warn   <- function(...) flumen_block("Flumen workflow warning.",  list(...))
 

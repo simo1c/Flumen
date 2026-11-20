@@ -985,7 +985,7 @@ op <- new_R_task(
   ),
   ...
 )
-# Flumen workflow rejected.
+# Flumen declaration rejected.
 #   call      : new_workflow()
 #   task      : preprocess
 #   error     : input parameters on wildcard '{sample}' have conflicting expansion
