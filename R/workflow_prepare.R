@@ -219,8 +219,9 @@ detect_op_modalities <- function(op) {
 ## scheduler indices; returns the per-logical-parent grid and the flat list
 ## of all matched physical parents. Helper of
 ## dependency_exp_and_DAG_resolution: takes the indices it needs as args
-## (lineage_idx, resolved_physicals are envs; dep_map, replace_op,
-## cumulative_replace_op are lists).
+## (lineage_idx, resolved_physicals and replace_op are envs, so they are reached
+## by name and not by position; dep_map and cumulative_replace_op are lists, and
+## either may be NULL).
 match_compatible_parents <- function(op, parent_ids, orig_exe_id,
                                       lineage_idx, resolved_physicals,
                                       dep_map, replace_op,

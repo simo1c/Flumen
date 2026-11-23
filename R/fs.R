@@ -147,7 +147,7 @@ new_file <- function(file_path, auto_mkdir = TRUE){
 #' @param object Optional character. A placeholder like `"{{out}}"`. If
 #'   `NULL` (default), Flumen auto-generates a unique UUID placeholder.
 #'
-#' @return A character vector with class `object`.
+#' @return A character vector with class `flumen_object`.
 #'
 #' @seealso [new_file()], [new_dep()], [new_object_exp()], [new_object_aggr()]
 #'
@@ -175,7 +175,7 @@ new_object <- function(object = NULL){
 #' @param object Optional character placeholder (e.g., `"{sample}"`). If
 #'   `NULL`, an auto-generated placeholder is used.
 #'
-#' @return A character vector with classes `expansion`, `object`.
+#' @return A character vector with classes `expansion`, `flumen_object`.
 #'
 #' @seealso [new_object()], [new_object_aggr()], [new_file_exp()]
 #'
@@ -209,7 +209,7 @@ new_object_exp <- function(object = NULL){
 #'   all wildcards (a single instance).
 #'
 #' @return A character vector with classes `aggregation` (or
-#'   `partial_aggregation`), `object`.
+#'   `partial_aggregation`), `flumen_object`.
 #'
 #' @section Element order and identity:
 #' The aggregated list is **not** in wildcard order and its elements carry no

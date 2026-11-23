@@ -17,7 +17,7 @@ all wildcards (a single instance).}
 }
 \value{
 A character vector with classes \code{aggregation} (or
-\code{partial_aggregation}), \code{object}.
+\code{partial_aggregation}), \code{flumen_object}.
 }
 \description{
 Marks an object input for wildcard aggregation: all wildcard values are

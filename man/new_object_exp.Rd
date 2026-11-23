@@ -11,7 +11,7 @@ new_object_exp(object = NULL)
 \code{NULL}, an auto-generated placeholder is used.}
 }
 \value{
-A character vector with classes \code{expansion}, \code{object}.
+A character vector with classes \code{expansion}, \code{flumen_object}.
 }
 \description{
 Marks an object input for wildcard expansion: each wildcard value produces

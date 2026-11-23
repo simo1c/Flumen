@@ -11,7 +11,7 @@ new_object(object = NULL)
 \code{NULL} (default), Flumen auto-generates a unique UUID placeholder.}
 }
 \value{
-A character vector with class \code{object}.
+A character vector with class \code{flumen_object}.
 }
 \description{
 Marks a value (or output placeholder) as an in-memory object passed
