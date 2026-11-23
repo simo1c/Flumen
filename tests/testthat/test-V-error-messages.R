@@ -95,7 +95,7 @@ test_that("V6 — backticks in an R task explain that they are shell-only", {
 
 test_that("V7 — self_host on a local worker names the worker and the alternative", {
   expect_good_error(
-    new_worker("w1", self_host = "1.2.3.4", n_concurrent_task = 1),
+    new_worker("w1", self_host = "192.0.2.1", n_concurrent_task = 1),
     c("'w1'", "self_host", "master_host"), "V7")
 })
 
