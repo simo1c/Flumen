@@ -2,7 +2,7 @@ Package: flumen
 Type: Package
 Title: An R Workflow Manager for Distributed Bioinformatics without Centralized Storage
 Version: 1.0.0
-Date: 2026-11-20
+Date: 2026-11-23
 Authors@R: c(
     person("Simone", "Caligola", email = "s.caligola@gmail.com",
            role = c("aut", "cre")),
