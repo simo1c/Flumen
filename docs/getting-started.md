@@ -638,7 +638,9 @@ run_workflow(
   workflow,
   worker_list      = list(w_local, w_remote),
   chunk_size       = 1e8,
-  master_host      = "192.168.1.10",   # the master's address, reachable by the remotes; auto-detected if NULL
+  master_host      = "192.168.1.10",   # the master's address, reachable by the remotes.
+                                       # If NULL, the machine's hostname is used, so the
+                                       # remotes must be able to resolve it
   ports            = 61000:61099       # master's per-remote-worker listen pool (the default)
 )
 ```
