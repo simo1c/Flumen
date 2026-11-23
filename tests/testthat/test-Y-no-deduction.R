@@ -4,8 +4,7 @@
 ## every one of those. This test keeps the removed deductions from returning:
 ## each entry is a code shape that implemented one of them, searched in the
 ## package sources with comment lines stripped. It runs only where the sources
-## are reachable (the suite is run from the source tree, see
-## tests/tools/RIENTRO.md).
+## are reachable, that is when the suite is run from the source tree.
 
 r_dir <- testthat::test_path("..", "..", "R")
 

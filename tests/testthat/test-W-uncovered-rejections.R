@@ -1,10 +1,9 @@
 ## Group W — build-time rejections that no test reached.
 ##
-## Measured with covr: R/validation.R has 31 stop() sites and the suite exercised
-## 15 of them. Several of the rest are covered by standalone scripts in
-## tests/regression/ (bare wildcards, unbalanced backticks); the ones below had no
-## test anywhere. They are guarantees flumen makes to the user, so each is now
-## pinned: the rejection must fire, and the message must name what is wrong.
+## R/validation.R refuses far more shapes than the rest of the suite reaches.
+## The ones below had no test anywhere. They are guarantees flumen makes to the
+## user, so each is pinned here: the rejection must fire, and the message must
+## name what is wrong.
 ##
 ## All of these fail during new_workflow() / new_wildcard_list(), before any
 ## process or socket exists, so the group is fast and deterministic.

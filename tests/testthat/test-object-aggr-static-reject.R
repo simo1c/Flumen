@@ -4,7 +4,7 @@
 ## file-only construct (new_file_aggr). A static OBJECT aggregation is silently
 ## unmatchable: the producer's static object output is registered, but the
 ## aggregation resolves to no producer at runtime ("could not be resolved to a
-## producer") or hangs. validate_new_workflow() now fails loudly with a pointer
+## producer") or hangs. validate_workflow() fails loudly instead, with a pointer
 ## to the correct pattern.
 
 wl <- new_wildcard_list(a = c("a1", "a2"), b = c("b1", "b2"))

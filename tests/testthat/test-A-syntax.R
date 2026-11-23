@@ -1,7 +1,7 @@
 ## Group A — Wildcard placeholder syntax.
 ## Build-time unit tests: validate that flumen recognises and tags each
 ## placeholder syntax variant onto the value class chain. No workflow is
-## executed; failures here surface as build_workflow() construction errors.
+## executed; failures here surface as new_workflow() construction errors.
 
 test_that("A1 — single static workflow wildcard {x} produces N instances", {
   ## Two-task DAG so flumen has a connected graph; A is the wildcard-expanded

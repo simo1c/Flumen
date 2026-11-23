@@ -1,7 +1,6 @@
 ## Scheduler-state simulators. Used by unit tests in groups C/D/E to exercise
 ## the scheduler logic (update_scheduler_state, on_task_finished, try_schedule)
-## WITHOUT spawning real workers. Mirrors the pattern of
-## test_update_scheduler_aggregate_renamed_parents.R.
+## WITHOUT spawning real workers.
 
 #' Build a synthetic sched_state with given dep_map.
 #' @param dep_map named list (child_exe_id -> character vector of parent_exe_ids)

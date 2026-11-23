@@ -1,9 +1,8 @@
 ## What a task produced is not deduced from a snapshot of
 ## its output directories. A declared output that exists before the
-## task runs is refused (wrapper_refuse_preexisting_outputs, exercised end to
-## end by tests/regression/test_rerun_dirty_dir.R and
-## test_dynamic_ignores_pre_existing.R); after the run, everything the pattern
-## matches is the task's own, and a static output is produced iff it exists.
+## task runs is refused (wrapper_refuse_preexisting_outputs); after the run,
+## everything the pattern matches is the task's own, and a static output is
+## produced iff it exists.
 ## Two dynamic patterns of different instances that can match the same names
 ## in one directory are refused at validation.
 
@@ -36,10 +35,8 @@ test_that("produced_files names only what appeared since the start, for the by-p
 })
 
 ## The second half of the rule -- no other task may declare a pattern that
-## would accept my files -- was already enforced before this stage, by
-## patterns_overlap() / validate_no_overlapping_output_globs() and covered by
-## tests/regression/test_runtime_expanded_shared_dynamic_output.R (the
-## "A_{{n}}.txt swallows A_1's file" arm). Nothing is added here: a second
+## would accept my files -- is already enforced by patterns_overlap() and
+## validate_no_overlapping_output_globs(). Nothing is added here: a second
 ## rule would only fire first with a worse message.
 test_that("overlapping output globs of two tasks are already refused, by witness substitution", {
   expect_true(flumen:::patterns_overlap("A_*", "A_1_*"))
