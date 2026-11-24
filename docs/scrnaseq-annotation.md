@@ -399,12 +399,3 @@ outputs, or run elsewhere.
 -   **Several outputs from one task.** `integrate` declares a dynamic
     file bundle and a static file, and `annotate` depends on each
     separately, so the two arrive as two distinct inputs.
-
-# Where to go next
-
--   [Getting started](getting-started.md), the building blocks, the
-    `{x}` / `{{x}}` rules, and resource pinning (`requires` /
-    `resources`).
--   [FLUMEN DSL](FLUMEN_DSL.md), the exhaustive reference.
--   `?new_shell_task`, `?new_R_task`, `?new_python_task`, `?new_dep`,
-    `?new_file_aggr`, `?pre_staged`, `?ssh_launcher`, `?run_workflow`.

@@ -802,16 +802,3 @@ locality-aware placement.
 | `overlapping TCP port ranges: 'w1' A..B and 'w2' C..D` | two workers on one host (or the master + a co-located worker) overlap | shift one worker's `new_worker(ports = ...)` so the ranges are disjoint |
 | `peer-to-peer port pool (...) exhausted` | a worker's transfer pool is too small for its concurrency | widen `new_worker(ports = ...)` or lower `n_concurrent_task` |
 | `the remote working directory <dir> does not exist on <host>` (or ssh's own message, e.g. `ssh: connect to host <host> port 22: Connection refused`) | the SSH pre-flight check, where the launcher's `cwd` (defaulting to the worker's `root_path`) is missing on the remote (or SSH failed) | `ssh <host> mkdir -p <dir>`, or pass a valid `cwd`/`root_path`, and for SSH, check the passwordless key + reachability |
-
-# Where to go next
-
--   `?new_workflow`, `?new_worker`, `?run_workflow` are the main entry
-    points.
--   `?new_R_task`, `?new_python_task`, `?new_shell_task` are the three
-    task types. `?new_input`, `?new_output`, `?new_dep`,
-    `?new_object_exp`, `?new_object_aggr`, `?new_file_exp`,
-    `?new_file_aggr` cover declaring data flow, while `?ssh_launcher`
-    and `?start_worker` cover remote setup.
--   [FLUMEN DSL](FLUMEN_DSL.md) is the exhaustive reference (every
-    signature, every caveat, decision trees), kept in sync with the
-    code.
