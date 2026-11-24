@@ -221,9 +221,9 @@ results come back together.
 | Variant | Effect | Notes |
 |------------------------|:----------------------:|------------------------|
 | `new_object("...")` / `new_file("...")` | 1-to-1 | one upstream value becomes one downstream value |
-| `new_object_exp("{wc}")` / `new_file_exp("dir/{wc}.ext")` | **scatter** | one task instance per wildcard value |
-| `new_object_aggr("{{name}}")` / `new_file_aggr("dir/{wc}.ext")` | **aggregate** | all upstream instances become one list for a single consumer |
-| `new_object_aggr("{{name}}", by = "wc1")` / `new_file_aggr("dir/{wc1}_{wc2}.ext", by = "wc1")` | **partial aggregate** | one consumer per `wc1`, each getting a list aggregated over the *other* wildcards |
+| `new_object_exp("{wc}")` / `new_file_exp("dir/{wc}.ext")` | scatter | one task instance per wildcard value |
+| `new_object_aggr("{{name}}")` / `new_file_aggr("dir/{wc}.ext")` | aggregate | all upstream instances become one list for a single consumer |
+| `new_object_aggr("{{name}}", by = "wc1")` / `new_file_aggr("dir/{wc1}_{wc2}.ext", by = "wc1")` | partial aggregate | one consumer per `wc1`, each getting a list aggregated over the *other* wildcards |
 
 `_exp` and `_aggr` are forbidden inside `new_output(...)`, because
 expansion of a task follows from its *inputs*, not its outputs.
@@ -291,7 +291,7 @@ of files is handled with `new_file()` / `new_file_aggr()`.
     paths.
 
 The backticks in the first two bullets mark the *static* part of a
-pattern and are **shell-only**: they are rejected at build time in a
+pattern and are shell-only: they are rejected at build time in a
 `new_R_task()` or `new_python_task()` parameter. The tools in those
 examples (`bowtie2-build`, `fastqc`, `cellranger`) are external
 commands, so they are shell tasks and the backtick form is the correct one
@@ -384,7 +384,7 @@ without them). The `python3` on path can be specified in each worker:
 
 There are two ways to declare a command.
 
-**`new_cmd("toolname")`** is preferred for a single tool with no shell
+`new_cmd("toolname")` is preferred for a single tool with no shell
 logic. `flumen` builds the argument list directly from `new_input` /
 `new_output` (in declaration order: inputs, then outputs) and executes
 the binary directly, with no shell involved, so no quoting, globbing, or
@@ -403,7 +403,7 @@ trim <- new_shell_task(
 )
 ```
 
-**`new_script('...')`** is useful when you actually need shell features:
+`new_script('...')` is useful when you actually need shell features:
 pipes, redirections, derived variables, multiple commands, conditionals.
 `{name}` placeholders in the body are replaced with the matching
 parameter value (file paths are substituted as plain strings).
@@ -423,7 +423,7 @@ align <- new_shell_task(
 
 Points to note:
 
--   **The backslash-newline pitfall.** If you split a shell command
+-   The backslash-newline pitfall. If you split a shell command
     across several lines and end a line with a backslash to continue it,
     as you normally would in a shell script, R silently deletes that
     backslash inside a single-quoted string. Your single command then
@@ -433,7 +433,7 @@ Points to note:
     string, `r"( ... )"`, which keeps the backslash; or (3) preferably,
     use `new_cmd()` when the task is just a single tool call.
 
--   **Shell inputs must be simple.** A shell task can consume atomic
+-   Shell inputs must be simple. A shell task can consume atomic
     scalars and vectors, logicals, file paths, and lists of those, but
     not a `data.frame`, matrix, array, or list of complex objects (it
     would error at run time with "cannot consume parameter '...' as
@@ -509,7 +509,7 @@ The same applies to any format: write an `.rds`, a `.csv` or a figure
 from the task, declare it with `new_file()`, and read it back from the
 session.
 
-**Logging.** A fresh log directory is created per run, and its path is
+Logging. A fresh log directory is created per run, and its path is
 printed at start (override with `run_workflow(log_dir = ...)`). The
 scheduler, each supervisor and each task wrapper write their own file
 there, so you can follow them while debugging a long run. From inside a
@@ -602,12 +602,12 @@ custom bootstrap, although a plain function carries no `resources`.
 
 There are two separate, easy-to-confuse port ranges:
 
--   **`run_workflow(ports = 61000:61099)`** is the master's listen pool.
+-   `run_workflow(ports = 61000:61099)` is the master's listen pool.
     `ports[1]` is a single result-uplink (notify) port shared by *all*
     remote workers; then each remote worker uses 2 consecutive ports
     (control + terminate). A workflow with `n` remote workers needs
     `length(ports) >= 1 + 2*n`. Local workers do not consume from it.
--   **`new_worker(ports = 61100:61199)`** is that worker's own
+-   `new_worker(ports = 61100:61199)` is that worker's own
     contiguous TCP range for peer-to-peer transfer. `ports[1]` is its
     data-request listen socket (open for the entire run, dialed by the
     master and by peer workers), while `ports[2:N]` is a transfer pool
@@ -666,7 +666,7 @@ launch with `run_workflow(shared_path = ...)`. Any file whose path lies
 under a declared root is read by the consumer from that root, so flumen
 transfers nothing and the task definitions do not change.
 
-This applies to a task's **outputs** as well, not only to the inputs you
+This applies to a task's outputs as well, not only to the inputs you
 declare yourself. When a file output under a declared root is consumed by a
 downstream task on another machine, the consumer reads it from the mount
 instead of receiving the bytes peer-to-peer. So the same pipeline moves
@@ -683,8 +683,8 @@ dispatches a task to a worker that satisfies it. If none can,
 
 | Entity | Code location | Argument |
 |------------------------|------------------------|------------------------|
-| **task**, what it needs | `new_R_task` / `new_python_task` / `new_shell_task` | `requires = list(cpu = , mem = , gpu = , tags = )` |
-| **worker**, what it offers | `ssh_launcher` for a launched worker, `new_worker` for a local one | `resources = list(cpu = , mem = , gpu = , tags = )` |
+| task, what it needs | `new_R_task` / `new_python_task` / `new_shell_task` | `requires = list(cpu = , mem = , gpu = , tags = )` |
+| worker, what it offers | `ssh_launcher` for a launched worker, `new_worker` for a local one | `resources = list(cpu = , mem = , gpu = , tags = )` |
 
 Both use the same schema, a named list with optional `cpu` (non-negative
 integer), `mem` (a string with a unit: `"32G"`, `"128GB"`, `"16384M"`,
@@ -755,12 +755,12 @@ report <- new_R_task(
 
 Workers are selected as follows:
 
--   **`train`** (`gpu = 1`): only `gpu1` advertises a GPU, so every
+-   `train` (`gpu = 1`): only `gpu1` advertises a GPU, so every
     `train` instance runs there, while `cpu1` and `util1` have no `gpu`
     field and do not match.
--   **`crunch`** (`cpu = 32`): only `cpu1` (64 cores) qualifies, since
+-   `crunch` (`cpu = 32`): only `cpu1` (64 cores) qualifies, since
     `gpu1` (16) and `util1` (8) fail on CPU.
--   **`report`** (`cpu = 4, mem = "8G"`): every worker qualifies, and
+-   `report` (`cpu = 4, mem = "8G"`): every worker qualifies, and
     among them the locality-aware policy prefers the one already holding
     `crunch`'s output, which avoids a cross-worker transfer.
 

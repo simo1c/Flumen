@@ -131,7 +131,7 @@ op_preprocess <- new_R_task(
 )
 ```
 
-The body ends with the function, whose **value is the function itself**.
+The body ends with the function, whose value is the function itself.
 Flumen calls that value, so a trailing statement after the definition
 would silently become the task's body and the function would be lost.
 
@@ -141,13 +141,13 @@ An R task with a full aggregation: `new_object_aggr("{{seu}}")` gathers
 all six Seurat objects into one list for a single joint step. Two of
 them arrive from the other Linux worker, in memory.
 
-This task declares **two** outputs, and both must be files. A sparse
+This task declares two outputs, and both must be files. A sparse
 matrix is not one of the types Arrow can encode, and CellTypist needs
 every gene, so the dense form would be several gigabytes. Since a task's
 outputs must be all files or all objects, the embedding, which a
 `data.frame` would keep in memory, follows the matrix to disk.
 
-The two patterns live in **different directories**. `annotate_input/{{e}}`
+The two patterns live in different directories. `annotate_input/{{e}}`
 is dynamic and claims everything in its directory, so a fourth file
 written there would be collected along with the 10x triplet.
 
@@ -219,8 +219,8 @@ op_integrate <- new_R_task(
 
 # 5. `annotate`: CellTypist
 
-A Python task, pinned to the Mac. It declares **two dependencies on the
-same producer**, one per `integrate` output: the 10x triplet as an
+A Python task, pinned to the Mac. It declares two dependencies on the
+same producer, one per `integrate` output: the 10x triplet as an
 aggregation, and the embedding as a single file.
 
 Its one output is a table, not a figure. Colour, legend language and
@@ -382,21 +382,21 @@ outputs, or run elsewhere.
 
 # What this example demonstrates
 
--   **Three languages in one pipeline.** The tasks run in shell (Cell
+-   Three languages in one pipeline. The tasks run in shell (Cell
     Ranger), then R (Seurat), then Python (CellTypist).
--   **No centralized storage is required.** There is no shared
+-   No centralized storage is required. There is no shared
     filesystem. Large inputs are `pre_staged()` on the worker that needs
     them, and every output moves directly from the producing worker to
     the consuming one.
--   **Objects and files, one mechanism.** The per-sample Seurat objects
-    cross between machines **in memory**; the `integrate` outputs cross
+-   Objects and files, one mechanism. The per-sample Seurat objects
+    cross between machines in memory; the `integrate` outputs cross
     as files. Both are declared the same way and moved by the same
     machinery, differing only in substrate.
--   **Scatter and aggregate over samples.** `count` and `preprocess`
+-   Scatter and aggregate over samples. `count` and `preprocess`
     expand into one instance per `{sample}`, while `integrate` and
     `annotate` aggregate. The `by = "sample"` partial aggregation keeps
     each `preprocess` reading only its own matrix.
--   **Several outputs from one task.** `integrate` declares a dynamic
+-   Several outputs from one task. `integrate` declares a dynamic
     file bundle and a static file, and `annotate` depends on each
     separately, so the two arrive as two distinct inputs.
     
