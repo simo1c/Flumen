@@ -45,8 +45,7 @@ the FASTQ directories are `pre_staged()`: they are already on the
 workers and Flumen must not try to move them.
 
 Only the filtered matrix is declared as an output. Cell Ranger also
-writes a BAM, but nothing downstream consumes it, and an output with no
-consumer is wasted work in the delivery path.
+writes a BAM, but nothing downstream consumes it.
 
 `{{m}}` is dynamic: the number of files Cell Ranger writes into
 `filtered_feature_bc_matrix/` is not known when the workflow is built,
@@ -223,11 +222,9 @@ A Python task, pinned to the Mac. It declares two dependencies on the
 same producer, one per `integrate` output: the 10x triplet as an
 aggregation, and the embedding as a single file.
 
-Its one output is a table, not a figure. Colour, legend language and
-point size are presentation choices that change without a single cell
-changing, and each such edit would otherwise cost a run of this
-pipeline. The csv carries the UMAP coordinates beside the labels, so it
-stands alone and a figure can be drawn directly from it.
+Its one output is `results/celltypist_labels.csv`, one row per cell,
+with the sample, the cluster, the UMAP coordinates, the CellTypist label
+and the lineage.
 
 ```r
 op_annotate <- new_python_task(
