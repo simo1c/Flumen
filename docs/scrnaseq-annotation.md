@@ -137,8 +137,8 @@ would silently become the task's body and the function would be lost.
 # 4. `integrate`: Seurat CCA, two file outputs
 
 An R task with a full aggregation: `new_object_aggr("{{seu}}")` gathers
-all six Seurat objects into one list for a single joint step. Two of
-them arrive from the other Linux worker, in memory.
+all six Seurat objects into one list for a single joint step. Those
+produced on another worker arrive in memory.
 
 This task declares two outputs, and both must be files. A sparse
 matrix is not one of the types Arrow can encode, and CellTypist needs
