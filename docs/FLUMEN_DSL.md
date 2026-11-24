@@ -1193,11 +1193,11 @@ In the cells, backticks mark the static part of a pattern and are shell-only (se
 
 | Scenario | Output declaration on producer | Consumer declaration |
 |------------------------|------------------------|------------------------|
-| F1 Pattern-deterministic multi-file, as when `bowtie2-build` produces `idx.1.bt2`, `idx.2.bt2` and so on | `` new_file('`idx`/{{N}}.bt2') `` or `` new_file('`idx`.{{N}}.bt2') `` | `` new_dep(task_id="prod", value = new_file_aggr('`idx`.{{N}}.bt2')) `` |
-| F2 Runtime-arbitrary names, as produced by `cellranger` or `fastqc`, whose filenames are unknown in advance | `` new_file('`outs/`{{any}}.txt') `` | `` new_dep(task_id="prod", value = new_file_aggr('`outs/`{{any}}.txt')) `` |
-| F3 Pre-existing reference directory (genome index, db) | input only, `new_input(ref = pre_staged(new_file(abs_dir)))` | n/a (consumed in place by the tool) |
-| F4 Explicit multi-file vector (known at build time) | input only, `new_file(c("a.fa", "b.fa", "c.fa"))` | n/a |
-| F5 Full output bundle of A consumed by B (multiqc / archival) | producer: `` new_file('`outs/`{{any}}') `` | `` new_dep(task_id="A", value = new_file_aggr('`outs/`{{any}}')) `` |
+| F1. Pattern-deterministic multi-file, as when `bowtie2-build` produces `idx.1.bt2`, `idx.2.bt2` and so on | `` new_file('`idx`/{{N}}.bt2') `` or `` new_file('`idx`.{{N}}.bt2') `` | `` new_dep(task_id="prod", value = new_file_aggr('`idx`.{{N}}.bt2')) `` |
+| F2. Runtime-arbitrary names, as produced by `cellranger` or `fastqc`, whose filenames are unknown in advance | `` new_file('`outs/`{{any}}.txt') `` | `` new_dep(task_id="prod", value = new_file_aggr('`outs/`{{any}}.txt')) `` |
+| F3. Pre-existing reference directory (genome index, db) | input only, `new_input(ref = pre_staged(new_file(abs_dir)))` | n/a (consumed in place by the tool) |
+| F4. Explicit multi-file vector (known at build time) | input only, `new_file(c("a.fa", "b.fa", "c.fa"))` | n/a |
+| F5. Full output bundle of A consumed by B (multiqc / archival) | producer: `` new_file('`outs/`{{any}}') `` | `` new_dep(task_id="A", value = new_file_aggr('`outs/`{{any}}')) `` |
 
 **Pitfall**: the path you declare in `new_output()` must equal where your `exec` actually writes. Flumen does not redirect the tool's output, and the declaration is only matched against the files the script produces. Choosing a convenient output directory name when the tool writes to a fixed path is a bug: `cellranger mkfastq` always writes under `<id>/outs/fastq_path/`, `cellranger count` under `<id>/outs/`, and that path is the one to declare, not one chosen for convenience.
 
