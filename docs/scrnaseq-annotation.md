@@ -399,3 +399,4 @@ outputs, or run elsewhere.
 -   **Several outputs from one task.** `integrate` declares a dynamic
     file bundle and a static file, and `annotate` depends on each
     separately, so the two arrive as two distinct inputs.
+    
