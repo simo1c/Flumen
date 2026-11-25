@@ -2,3 +2,5 @@
 ^CITATION\.cff$
 ^docs$
 central_scheduler_task_table_log\.tsv$
+__pycache__
+\.pyc$
