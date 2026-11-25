@@ -2,8 +2,8 @@
 ## cache_get() must reclaim an entry's disk copy only when the entry is promoted
 ## back to RAM. An entry LARGER than max_ram cannot be promoted, so reclaiming it
 ## on first read would leave no copy and the next co-local / P2P consumer would
-## get NULL. Over-RAM entries keep their disk copy until cache_reset() at
-## workflow end. Pure in-process unit tests.
+## get NULL, crashing in get_result_instance. Over-RAM entries keep their disk
+## copy until cache_reset() at workflow end. Pure in-process unit tests.
 
 ## Minimal result_object holding one raw element of `n` bytes (cache_set sizes
 ## an entry by the length of its raw elements; non-raw results count as 0).

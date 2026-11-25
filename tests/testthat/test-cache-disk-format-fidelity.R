@@ -3,9 +3,10 @@
 ##
 ## `is_raw` and `is_arrow` are distinct: a non-Arrow R object (S4 / list / Seurat)
 ## is qs2-serialized to RAW bytes (is_raw=TRUE) while its semantic is_arrow is
-## FALSE. Conflating them makes a consumer decode qs2 bytes as Arrow and crash
-## ("Invalid IPC stream"). Both flags and `elem_name` are persisted as their own
-## fields, so a named multi-output keeps its names across a spill.
+## FALSE. If read_result_from_disk derived `is_arrow = is_raw` instead of reading
+## what write_result_to_disk persisted, a consumer would decode qs2 bytes as Arrow
+## and crash ("Invalid IPC stream"). Both flags and `elem_name` are persisted as
+## their own fields, so a named multi-output keeps its names across a spill.
 
 rt <- function(el) {
   tf <- tempfile(fileext = ".bin")

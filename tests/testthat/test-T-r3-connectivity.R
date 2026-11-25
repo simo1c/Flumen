@@ -1,7 +1,8 @@
 ## register_worker_p2p_endpoint ONLY fills the worker's P2P endpoint (Host +
 ## Socket_data_req). Reachability and the abort-on-unreachable decision belong to
-## the connectivity-check phase, whose matrix semantics are characterised in
-## test-U-reachability.R.
+## the connectivity-check phase, whose matrix semantics -- including that
+## scheduler->worker is required only when a local worker is co-located -- are
+## characterised in test-U-reachability.R.
 
 mk_supinfo <- function(drp){
   data.frame(Supervisor_ID = "w1", PID = NA_integer_,
