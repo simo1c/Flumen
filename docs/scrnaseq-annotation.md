@@ -12,8 +12,8 @@ the difference between `{x}` and `{{x}}`, `new_dep`, and the `_exp` and
 
 The pipeline is made of four tasks. `count` runs one instance per sample
 and produces a gene-expression matrix. `preprocess` also runs once per
-sample, and its N Seurat objects are aggregated by `integrate` into a
-single joint step. `integrate` emits two file outputs, which
+sample, and the per-sample Seurat objects are aggregated by `integrate`
+into a single joint step. `integrate` emits two file outputs, which
 `annotate` consumes as two separate dependencies on the same producer.
 
     count[shell]  ->  preprocess[R]  ->  integrate[R]  ->  annotate[Python]

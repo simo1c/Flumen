@@ -25,6 +25,6 @@ keywords:
   - peer-to-peer data transfer
   - Apache Arrow
 version: 1.0.0
-date-released: "2026-11-24"
+date-released: "2026-11-25"
 license: MIT
 repository-code: "https://github.com/simo1c/Flumen"

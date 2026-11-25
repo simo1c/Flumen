@@ -357,7 +357,7 @@ run_workflow(workflow,
 ```
 
 -   `workflow`: a `workflow_object`. A simple `task_object` is rejected, so wrap it first with `new_workflow(workflow_id = "wf", task_list = list(my_task))`. There is no auto-coercion, and the error states exactly this.
--   `worker_list`: the list of `new_worker()` objects the run may dispatch to. At least one is required: both the `NULL` default and an empty list are rejected with `"'worker_list' must contain at least one worker"`. A single worker still has to be wrapped, `worker_list = list(w)`. A worker object is itself a list, so `worker_list = w` has non-zero length and would otherwise reach the later checks; it is caught by its own error, `"'worker_list' must be a list of workers, not a single worker"`.
+-   `worker_list`: the list of `new_worker()` objects the run may dispatch to. At least one is required: both the `NULL` default and an empty list are rejected with `"'worker_list' must contain at least one worker"`. A single worker still has to be wrapped, `worker_list = list(w)`. A worker object is itself a list, so `worker_list = w` has non-zero length; it is caught by its own error, `"'worker_list' must be a list of workers, not a single worker"`.
 -   `chunk_size`: max bytes per NNG chunk. Defaults to `1e8` (100 MB).
 -   `master_host`: master's IP or hostname as seen by remote workers. If `NULL`, it is auto-detected as this machine's hostname, so the workers must be able to resolve it. Set it explicitly on multi-interface or VPN setups.
 -   `ports`: the contiguous TCP port range the master uses for its inbound listen sockets. `ports[1]` is the shared notify port and two further ports are taken per remote worker, so `length(ports) >= 1 + 2*n`. Default `61000:61099`. Local workers do not consume from this pool. The full model, the port plan printed at start and the overlap rule are in section 6.2.
@@ -1132,7 +1132,7 @@ C <- new_R_task(
 )
 ```
 
-The broadcast is silent (no warning emitted) by design, mirroring the no-wildcard-ref case which has always broadcast silently.
+The broadcast is silent: no warning is emitted, as in the no-wildcard-ref case.
 
 #### 5.3.3 Memory bounds of aggregation
 

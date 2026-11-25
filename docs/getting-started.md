@@ -28,17 +28,8 @@ in their original binary format. There is no disk round-trip, and no
 shared filesystem is required.
 
 The DAG is parametrised by wildcards and expanded both at build and run
-time. A single-sample pipeline grows to N samples by adding wildcard
-values, with no change to the task definitions.
-
-Flumen is useful when:
-
--   You have workflows that mix R, Python and a shell task and you do not
-    want to use a centralized storage.
--   You run the same pipeline over many inputs with the expansion
-    handled for you.
--   You move expensive steps to a larger machine or a cluster by changing
-    only the worker list, with no pipeline rewrite.
+time. A pipeline written for one sample runs over many by adding
+wildcard values, with no change to the task definitions.
 
 ## Installation
 
@@ -215,7 +206,7 @@ on more than one of the same parent's outputs.
 
 ## Scatter and aggregate: the `_exp` / `_aggr` family
 
-This is how a pipeline written for one item runs over N, and how the N
+This is how a pipeline written for one item runs over many, and how the
 results come back together.
 
 | Variant | Effect | Notes |
