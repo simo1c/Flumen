@@ -351,9 +351,6 @@ sched_report_dispatch_failure <- function(state, df){
 ## arguments and returns the changed ones in a list, so it depends on no scheduler
 ## state. The threading between it and `state` lives here, so every call site does
 ## it the same way.
-##
-## `state` is an environment (see new_scheduler_state), so the assignments below are
-## visible to the caller and there is nothing to return.
 sched_try_schedule <- function(state){
 
   res_exe <- try_schedule(state$sched_state, state$workflow, state$exe_id_to_idx,

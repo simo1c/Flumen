@@ -237,16 +237,14 @@ update_param_wildcard_with_value <- function(par_list,
   ## again in prepare_code_and_parameters_for_wrapper is a buffer copy per
   ## constituent.
   ##
-  ## The producer's (type, codec) is pinned ON the element rather than kept in
-  ## a vector parallel to the container: resolution is progressive (one
-  ## constituent at a time, from producers that finish in any order) and
-  ## expand_wrapped_params flattens composite producers, so a parallel vector
-  ## would have to stay aligned through both reorderings. Travelling with the
-  ## payload, the metadata cannot fall out of step with it. The attributes are
-  ## consumed and removed in prepare_code_and_parameters_for_wrapper; they
-  ## never reach the wire. A native element gets the same label when the
-  ## caller gives one: a path is "file_path" whatever its constituent count
-  ## (a received "file" is on disk by now, hence the same label).
+  ## The producer's (type, codec) is pinned ON the element rather than kept in a
+  ## vector parallel to the container: resolution is progressive (one constituent
+  ## at a time, from producers finishing in any order) and expand_wrapped_params
+  ## flattens composite producers, so a parallel vector would have to stay aligned
+  ## through both reorderings. The attributes are consumed and removed in
+  ## prepare_code_and_parameters_for_wrapper and never reach the wire. A native
+  ## element gets the same label when the caller gives one: a path is "file_path"
+  ## whatever its constituent count (a received "file" is on disk by now).
   ##
   ## One label is NOT forwarded: the bare "wrapped" sentinel, decoded here
   ## instead. It means the producer could not Arrow-encode, so the bytes are qs2

@@ -161,17 +161,13 @@ launch_local_and_register_supervisors <- function(worker_list,
   return(sup_info)
 }
 
-## Open the TCP ctrl/term listen sockets for each remote worker and send its
-## handshake. Worker-initiated: the remote supervisor dials in to the master,
-## which PAIR-listens on Port_base (control/dispatch, worker keepalive up) and on
-## Port_base + 1 (dedicated terminate channel). The results/READY uplink is not
+## Open the TCP ctrl/term listen sockets for each remote worker (the layout is
+## described above) and send its handshake. The results/READY uplink is not
 ## opened here: sock_res is one scheduler-wide PULL listen on the shared notify
-## port, bound by init_sockets(). The handshake carries the worker's config
-## including its own peer-to-peer port range (ports[1] = data-request listen,
-## ports[2:N] = transfer pool), and is sent before the worker's PAIR dials in, so
-## NNG keeps it pending until then. Returns the updated socket_list/message_list.
-## (Local workers' IPC sock_ctrl is opened inline in sched_init_workflow(); only
-## the remote side is non-trivial enough to extract.)
+## port, bound by init_sockets(). The handshake is sent before the worker's PAIR
+## dials in, so NNG keeps it pending until then. Returns the updated
+## socket_list/message_list. (Local workers' IPC sock_ctrl is opened inline in
+## sched_init_workflow(); only the remote side is non-trivial enough to extract.)
 open_remote_worker_channels <- function(supervisor_info, 
                                         worker_list,
                                         socket_list, 

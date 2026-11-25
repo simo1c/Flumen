@@ -260,12 +260,10 @@ op_to_expand <- if(!is.null(required_by)){
     }))
   }
 
-  ### Must handle parameters-to-expand correctly, creating wildcards properly.
-  ### If an operation input is NOT _exp, do not pass a wildcard with multiple
-  ### elements -- otherwise it would be expanded anyway. The issue is that
-  ### multiple operations can depend on the same output parameter of another
-  ### operation but not all of them define an expansion parameter -- hence
-  ### op_to_expand and wildcard_list must be managed correctly.
+  ## An input that is NOT _exp must not receive a wildcard holding several
+  ## elements, or it expands anyway. Several ops can depend on the same output
+  ## of another op while only some of them declare an expansion parameter, so
+  ## op_to_expand and wildcard_list are built per consumer, not per producer.
 
   socket_worker   <- sup_info[sup_info$Supervisor_ID == res_notify$Supervisor_ID, "Socket_data_req"]
   host_worker     <- sup_info[sup_info$Supervisor_ID == res_notify$Supervisor_ID, "Host"]
@@ -303,13 +301,12 @@ op_to_expand <- if(!is.null(required_by)){
     ## Static task: no expansion needed.
     ## Directly replaces dep_object with output_req in the par_list of
     ## dependent tasks, without renaming exe_ids.
-    ## Also handles the case where the dep was declared with a pre-specified
-    ## value (new_dep(task, value=new_file(...))): par$value$value carries the
-    ## concrete path produced by the expansion, and
-    ## we match it against res_notify$dyn_wildcard so multi-instance producers
-    ## (e.g. alignment_1/_2/_3 emitting sam/s1.sam, sam/s2.sam, sam/s3.sam)
-    ## land on the right consumer instance and not on every dep_object that
-    ## happens to share the parent task_id.
+    ## Also handles a dep declared with a pre-specified value
+    ## (new_dep(task, value=new_file(...))): par$value$value carries the concrete
+    ## path from the expansion, matched against res_notify$dyn_wildcard so
+    ## multi-instance producers (alignment_1/_2/_3 emitting sam/s1.sam, s2, s3)
+    ## land on the right consumer instance and not on every dep_object sharing
+    ## the parent task_id.
     if(length(out_req_list) > 0 && length(op_to_expand) > 0){
       ## Lookup task index by exe_id. exe_id_to_idx (named integer vector) maps
       ## exe_id -> task_list position; single-bracket [name] yields NA on miss.

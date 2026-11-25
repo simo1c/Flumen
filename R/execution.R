@@ -382,12 +382,6 @@ format_resources <- function(resources) {
 }
 
 
-## Argument validation for run_workflow.
-## Raises stop() only for clearly broken cases, so that a workable declaration is
-## never refused. Three checks:
-##   (1) missing or empty worker_list
-##   (2) non-numeric or non-positive chunk_size
-##   (3) task$requires declares resources that no worker in worker_list can satisfy
 ## Workers the scheduler could not tell apart: it identifies each one by name
 ## (supervisor_info$Supervisor_ID), so two sharing a name collide in its tables.
 ## One source of truth for run_workflow(), which refuses them, and
@@ -397,6 +391,12 @@ duplicate_worker_names <- function(worker_list) {
   unique(nm[duplicated(nm)])
 }
 
+## Argument validation for run_workflow.
+## Raises stop() only for clearly broken cases, so that a workable declaration is
+## never refused. Three checks:
+##   (1) missing or empty worker_list
+##   (2) non-numeric or non-positive chunk_size
+##   (3) task$requires declares resources that no worker in worker_list can satisfy
 validate_exec_args <- function(workflow, worker_list, chunk_size) {
 
   ## A worker_object is itself a list, so a forgotten list()

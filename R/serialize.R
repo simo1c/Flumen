@@ -377,14 +377,11 @@ serialize_data <- function(data, data_type, to_arrow){
       
       if(to_arrow[i]){
 
-        ## Preserve the "wrapped:" prefix end-to-end (list-return / aggregation
-        ## marker; from_R_to_arrow returns only the base type). Both the
-        ## resolved form "wrapped:<type>" AND the bare sentinel "wrapped"
-        ## (set when per-element types are not pre-resolved -- e.g. after
-        ## composite-producer flattening in expand_wrapped_params) must
-        ## propagate the prefix so the receiver knows each field is one
-        ## element of an aggregation (and Python's deserialize_param can
-        ## return a scalar for a 1-row field instead of a 1-element list).
+        ## Preserve the "wrapped:" prefix end to end (from_R_to_arrow returns
+        ## only the base type). Both the resolved "wrapped:<type>" and the bare
+        ## sentinel must propagate it, so the receiver knows each field is one
+        ## element of an aggregation and Python's deserialize_param can return a
+        ## scalar for a 1-row field instead of a 1-element list.
         wrapped_prefix_i <- if(data_type[i] == "wrapped" ||
                               startsWith(data_type[i], "wrapped:")) "wrapped:" else ""
 

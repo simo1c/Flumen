@@ -281,13 +281,11 @@ get_object_type <- function(ob) {
 }
 
 ## Per-param logical: was this param DECLARED as an aggregation (gather)?
-## Primary source is the `is_aggr` flag stamped onto the par object during
-## wildcard_expansion_and_alignment (the authoritative par_gather, reliable
-## even for a dynamic new_object_aggr whose value class is lost downstream).
-## Falls back to the value-level "aggregation" class for any par object built
-## outside that path. Consumed at delivery-prep to keep a 1-element gather a
-## list while a single non-aggregation object dep is delivered bare
-## (single-object-wrap fix). uuid-named to stay aligned with params_type.
+## Reads the `is_aggr` flag stamped during wildcard_expansion_and_alignment
+## (see above), falling back to the value-level "aggregation" class for a par
+## object built outside that path. Consumed at delivery-prep to keep a 1-element
+## gather a list while a single non-aggregation object dep is delivered bare.
+## uuid-named to stay aligned with params_type.
 get_params_is_aggr <- function(par_list, params_type_names) {
   flags <- vapply(par_list, function(par_object){
     if(!is.null(par_object$is_aggr)) return(isTRUE(par_object$is_aggr))

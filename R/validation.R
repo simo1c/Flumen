@@ -251,12 +251,10 @@ validate_workflow <- function(task_list, wildcard_list = NULL) {
                                 "for a static {wc}"), by_txt)), call. = FALSE)
       }
 
-      ## (3c) dep value-vs-producer-output pattern check.
-      ## When the user pre-specifies a path in new_dep(value=...), the pattern
-      ## must match (after lexical normalization) at least one output of the
-      ## referenced producer. Catches typos and producer-side renames at
-      ## construction time, instead of relying on a silent runtime mismatch
-      ## in the scheduler dispatch path.
+      ## (3c) a path pre-specified in new_dep(value=...) must match, after
+      ## lexical normalization, at least one output of the referenced producer.
+      ## Catches typos and producer-side renames at construction instead of as
+      ## a silent runtime mismatch in the dispatch path.
       ## any(nzchar(...)) rather than nchar(x) > 0: a dep declared as a BUNDLE,
       ## new_file(c("a.txt","b.txt")), gives one value per path, which `&&` refuses.
       if(!is.null(dep_op) && !is.null(dep_value_for_check) &&
@@ -693,11 +691,10 @@ validate_no_colliding_expanded_outputs <- function(task_list){
 }
 
 ## The same concern as the two checks above, decided on the RESOLVED paths
-## instead of on the pattern. Runs AFTER wildcard expansion, when every instance
-## already carries the concrete path it will write (op$output_files), so it also
-## catches what the pattern-level proxies miss: a task expanded over {s} and {r}
-## whose output names only {s}, and two combinations that collide once
-## substituted ({a}_{b} with a in {x, x_y}, b in {y_z, z} gives "x_y_z" twice).
+## (op$output_files) after expansion, so it also catches what the pattern-level
+## proxies miss: a task expanded over {s} and {r} whose output names only {s},
+## and combinations that collide once substituted ({a}_{b} with a in {x, x_y},
+## b in {y_z, z} gives "x_y_z" twice).
 ##
 ## Duplicates WITHIN one instance are deliberately ignored (a pattern repeating a
 ## wildcard can legitimately emit the same path twice during expansion); only a

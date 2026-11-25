@@ -293,13 +293,10 @@ decode_message_metadata <- function(message){
 
 ## Chunked-message dispatch for NNG over IPC/TCP.
 ##
-## SLIDING WINDOW OF K=2 IN-FLIGHT sendAio OBJECTS. `in_flight` is allocated for
-## n_chunks but never holds more than two live entries: issuing chunk i (i >= 2)
-## drains chunk i-1 with call_aio(), which returns once NNG has taken the bytes and
-## reported a result. K=2 also bounds RAM, two chunk_size buffers pinned at a time.
-## Handing NNG the bytes is not the same as putting them on the wire, so while
-## chunk i-1 drains R is already serialising chunk i+1, and the pipe stays full
-## without the whole message being held in RAM.
+## SLIDING WINDOW OF K=2 IN-FLIGHT sendAio OBJECTS: issuing chunk i (i >= 2)
+## drains chunk i-1 with call_aio(), so at most two chunk_size buffers are pinned.
+## Handing NNG the bytes is not putting them on the wire, so R serialises chunk
+## i+1 while i-1 drains: the pipe stays full without the whole message in RAM.
 ##
 ## PER-CHUNK TIMEOUT = 5 MINUTES (send_timeout_ms = 300000L). A chunk draining with
 ## a non-zero result (5 = timed out, or a transport error) is logged, the chunk
@@ -880,12 +877,9 @@ write_chunk_to_file <- function(file_name,
 ## exit status. The supervisor's "error" handler forwards the error to the scheduler,
 ## which broadcasts terminate and quits with status 1; run_workflow() then calls stop().
 ##
-##   task_id     : id of the failed operation (= msg_sender to supervisor)
-##   s         : pair socket to the supervisor
-##   chunk_size: chunk size passed to send_message_by_chunks
-##   message   : error string (conditionMessage for R, sprintf for shell status)
-##   stderr    : captured stderr (shell op; "" for R op)
-##   status    : exit status (shell op; NA_integer_ for R op)
+##   message : error string (conditionMessage for R, sprintf for shell status)
+##   stderr  : captured stderr (shell op; "" for R op)
+##   status  : exit status (shell op; NA_integer_ for R op)
 send_error_message <- function(task_id, s, chunk_size, message, stderr = "", status = NA_integer_){
 
   err_payload <- list(
@@ -1046,12 +1040,10 @@ init_sockets <- function(socket_list,
 
   if(worker_name == "Central scheduler"){
 
-    ## Central scheduler listens for results on a single unique path.
-    ## Per-worker dispatch sockets sock_ctrl_<name> are opened in
-    ## sched_init_workflow() after launch_local_and_register_supervisors() returns,
-    ## with the
-    ## per-worker IPC path (local) or TCP port (remote) recorded in
-    ## supervisor_info.
+    ## Central scheduler listens for results on a single unique path. Per-worker
+    ## dispatch sockets sock_ctrl_<name> are opened in sched_init_workflow()
+    ## after launch_local_and_register_supervisors() returns, with the per-worker
+    ## IPC path (local) or TCP port (remote) recorded in supervisor_info.
     if(is.null(sock_res_path)){
       stop(flumen_reject(
         error = "the scheduler was started without its result socket",

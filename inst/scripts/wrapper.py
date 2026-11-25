@@ -305,12 +305,12 @@ def main():
             # would shift it by however many file patterns the task declared.
             out_object_par_names = deserialize_vector_field(merged[7])
 
-            # The FORM each parameter is delivered in (merged[8]): "bare", "list" or
-            # "aggregate", one entry per declared parameter in slot order. The
-            # scheduler declares it and the wrapper reads it to build the container.
-            # The field layout is a contract: a message with fewer fixed fields than
-            # this build expects comes from a supervisor of another build, and its
-            # parameter fields start where this wrapper reads a fixed one.
+            # merged[8] is params_form (defined in R/supervisor_lib.R): "bare",
+            # "list" or "aggregate", one entry per declared parameter in order of
+            # first appearance among the slots. The field layout is a contract: a
+            # message with fewer fixed fields than this build expects comes from a
+            # supervisor of another build, and its parameter fields start where
+            # this wrapper reads a fixed one.
             if len(merged) < N_FIXED_DISPATCH_FIELDS:
                 raise RuntimeError(
                     f"the dispatch message carries {len(merged)} fixed field(s), this wrapper "
@@ -724,10 +724,9 @@ def main():
                 # become 'multi' with zero parts, caught by the first arm.
                 #
                 # Under a declared {{wc}} output a list means "these are my N
-                # outputs", so an empty one means zero, the error case, as R treats
-                # list(). Python has no separate empty-atomic literal, so "one empty
-                # output" is np.array([]), "" or an empty DataFrame, all of which
-                # still pass.
+                # outputs", so an empty one means zero, as R treats list().
+                # "One empty output" is np.array([]), "" or an empty DataFrame,
+                # which still pass.
                 #
                 # An empty DICT is refused under a STATIC output too: a dict is a
                 # named multi-output, one per key, so {} is zero outputs. The envelope

@@ -11,7 +11,7 @@ s <- flumen:::wrapper_connect(socket_path, task_id)
 tryCatch({
 
 ## Receive the dispatch message. Shared with wrapper.R (R/wrapper_lib.R), so the
-## blocking receive is written once. A failure at this point concerns the infrastructure, 
+## blocking receive is written once. A failure at this point concerns the infrastructure,
 ## not task processing, and is reported by the outer wrapper_fatal below.
 msg <- flumen:::wrapper_receive_task_message(s)
 

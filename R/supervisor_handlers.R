@@ -535,10 +535,9 @@ sup_handle_parameter_requested <- function(msg, state, recv_socket){
   if(isTRUE(chunk == n_chunks))
     to_log(paste0("Parameter requested of operation ", msg_id, " received from ", msg_sender), state$worker_name)
 
-  ## Root a received file under OUR root_path -- but only a RELATIVE name, which
-  ## is what "relative to my root" means and is the model the rest of the engine
-  ## follows: a holder serves names relative to its own root_path so a re-serve
-  ## does not nest twice.
+  ## Root a received file under OUR root_path -- but only a RELATIVE name: a
+  ## holder serves names relative to its own root_path, so a re-serve does not
+  ## nest twice.
   ##
   ## An ABSOLUTE declared path names a location, not an offset: prepending to it
   ## writes <root>/<declared absolute path>, somewhere the workflow never named.
@@ -1167,9 +1166,6 @@ supervisor_fatal <- function(e, state){
 ## wrapper still entirely in "wait_ready" never dialed back, cannot have a partial
 ## result in flight and is reported at once, while one that had connected is held
 ## for the quiescence check below.
-##
-## `state` is an environment (new_supervisor_state), so this mutates it in place
-## and returns nothing, like the sup_handle_* handlers.
 check_dead_wrappers <- function(state){
 
   if(length(state$reg_tasks) == 0L) return(invisible(NULL))

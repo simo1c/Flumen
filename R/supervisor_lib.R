@@ -102,17 +102,14 @@ send_file_received_to_central_scheduler <- function(socket,
   return(flag)
 }
 
-## Holder visibility. Notify the scheduler that this worker now
-## holds a COMPLETE copy of (exe_id, out_instance): it received the full output via
-## P2P and re-cached it (complete_p2p_transfer), so it can serve that output to a
-## peer. The scheduler records it in its holder index, which the fetch routing reads.
-## out_instance travels as a string ("" = the whole output / aggregated request),
-## matching the composite cache key used by the supervisor and the serve fallback.
-## Asynchronous fire-and-forget over sock_res; safe to ignore on older schedulers.
+## Holder visibility: tell the scheduler this worker now holds a COMPLETE copy
+## of (exe_id, out_instance) and can serve it to a peer, for its holder index.
+## out_instance travels as a string ("" = the whole output), matching the
+## composite cache key. Fire-and-forget over sock_res.
 ## `is_full` splits the message's two jobs: the scheduler ALWAYS releases the
-## serving_count for this completed serve, but records the sender as a holder ONLY
-## when is_full=TRUE. A per-sample-filtered (partial) copy must not be advertised
-## as a servable holder, yet its serve must still be released.
+## serving_count for this completed serve, but records the sender as a holder
+## ONLY when is_full=TRUE -- a per-sample-filtered copy must not be advertised
+## as servable, yet its serve must still be released.
 send_data_received_to_central_scheduler <- function(socket,
                                                     worker_name,
                                                     exe_id,
@@ -189,14 +186,12 @@ expand_wrapped_params <- function(my_list, param_type) {
   is_wrapped_list <- (param_type %in% c("wrapped", "file", "file_path") | is_wrapped_prefix) & sapply(my_list, is.list)
 
   ## Composite producer + multi-element output: each producer instance
-  ## contributes a sub-list (e.g., its own file paths via {{out}}, or its own
-  ## multi-output objects). Without flattening, the consumer would receive a
-  ## list-of-lists -- one sub-list per producer -- where a flat list of elements
-  ## is expected, and the per-slot sub-list would later re-expand inside
-  ## serialize_data, growing data_type beyond the outer envelope's column length
-  ## and crashing arrow::arrow_table with "All columns must have the same length".
-  ## Restricted to identical(class(x), "list") so data.frame (which inherits
-  ## from list) and other structured types are preserved as single elements.
+  ## contributes a sub-list. Unflattened, the consumer gets a list-of-lists
+  ## where a flat list is expected, and the sub-list re-expands inside
+  ## serialize_data, growing data_type past the envelope's column length and
+  ## crashing arrow::arrow_table with "All columns must have the same length".
+  ## Restricted to identical(class(x), "list") so a data.frame (which inherits
+  ## from list) is preserved as a single element.
   for (i in which(is_wrapped_list)) {
     v <- my_list[[i]]
     if (length(v) > 0 &&
@@ -249,20 +244,16 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
   ## mix of python + R/shell ops running concurrently on one worker stays correct.
   use_arrow <- isTRUE(get_wrapper_info(reg_tasks_wrapper$exe_object$type)$use_arrow)
 
-  ## The container a parameter is delivered in is DECLARED (params_form,
-  ## uuid-keyed, aligned with par_list by POSITION through par_uuids -- the
-  ## resolvers drop the name of the slot they replace, so names are not
-  ## reliable). A dependency
-  ## parameter is a list of constituents, one per producer, each holding the
-  ## elements that producer delivered; "aggregate" and "list" hand that list
-  ## to the expansion below, which flattens it to one slot per element.
-  ## "bare" is one constituent by contract (params_n_constituents) and is
-  ## delivered as its one element; a producer's own list return ("wrapped:X",
-  ## the producer's label, preserved end to end on every path) stays a list
-  ## even at one element, as the single-object-wrap rule below expects.
-  ## A dispatch message without params_form comes from a scheduler of another
-  ## build, and the containers it would produce are not the declared ones, so
-  ## the run stops here. Read once, for this block and for the form below.
+  ## params_form is uuid-keyed and aligned with par_list by POSITION through
+  ## par_uuids: the resolvers drop the name of the slot they replace, so names
+  ## are not reliable. A dependency parameter is a list of constituents, one per
+  ## producer. "aggregate" and "list" hand that list to the expansion below,
+  ## which flattens it to one slot per element; "bare" is one constituent by
+  ## contract (params_n_constituents), delivered as its one element. A producer's
+  ## own list return ("wrapped:X") stays a list even at one element. Without
+  ## params_form the dispatch comes from another build, whose containers are not
+  ## the declared ones, so the run stops. Read once, for this block and the form
+  ## below.
   .uuids <- reg_tasks_wrapper$exe_object$par_uuids
   .form  <- reg_tasks_wrapper$exe_object$params_form
   if(is.null(.form) || !all(.uuids %in% names(.form))){
@@ -297,17 +288,11 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
   params_is_arrow <- rep(reg_tasks_wrapper$exe_object$params_is_arrow, wrapped_count)
   n_params      <- length(par_list)
 
-  # Parameters in cache can be:
-  #   - raw Arrow bytes  (params_is_arrow[i] == TRUE)
-  #   - raw qs2 bytes    (params_is_arrow[i] == FALSE)
-  #   - native R objects (not raw)
-  #
-  # Strategy: raw bytes pass unchanged; the is_arrow flag tells the wrapper how
-  # to decode them (TRUE -> from_arrow_binary_to_R, FALSE -> qs2::qs_deserialize).
-  # Python op (use_arrow=TRUE): all Arrow, qs2 bytes get re-encoded.
-  # R op (use_arrow=FALSE): Arrow bytes stay Arrow (is_arrow=TRUE propagated from
-  #   params_is_arrow), qs2 bytes stay qs2 (is_arrow=FALSE). Eliminates the
-  #   useless Arrow->R->qs2 round-trip in the supervisor.
+  # A cached parameter is raw Arrow bytes (params_is_arrow TRUE), raw qs2 bytes
+  # (FALSE), or a native R object. Raw bytes pass unchanged and is_arrow tells
+  # the wrapper how to decode (from_arrow_binary_to_R vs qs2::qs_deserialize).
+  # A Python op re-encodes qs2 to Arrow; an R op leaves each codec as it is,
+  # avoiding an Arrow -> R -> qs2 round-trip in the supervisor.
 
   sender <- rep(worker_name, n_params + N_FIXED_DISPATCH_FIELDS)
   ## msg_type slot count after the leading "shell_interpreter" + "code" pair
@@ -392,30 +377,24 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
     stripped[!nzchar(stripped)] <- "R_object"
     params_type[strip] <- stripped
   }
-  ## Symmetric counterpart to `strip`: an AGGREGATION param (params_is_aggr)
-  ## that resolved to a SINGLE bare constituent must still be delivered as a
-  ## length-1 LIST -- the `_aggr` contract is "always a list", regardless of how
-  ## many upstream instances exist. The shape-based detection in the resolvers
-  ## (inherits(., "output_req_list")) cannot see this at 1 instance, so
-  ## params_type is left bare and aggregate_params (serialize.R) delivers it
-  ## unwrapped. Forcing the "wrapped:" marker makes aggregate_params wrap it into
-  ## a list of 1, matching the multi-instance shape. FILE gathers are included
-  ## for the same reason.
+  ## Symmetric counterpart to `strip`: the `_aggr` contract is "always a list",
+  ## so an AGGREGATION param (params_is_aggr) resolved to a SINGLE bare
+  ## constituent must still be delivered as a length-1 list. The resolvers'
+  ## shape detection (inherits(., "output_req_list")) cannot see this at one
+  ## instance, so forcing the "wrapped:" marker is what makes aggregate_params
+  ## (serialize.R) wrap it. FILE gathers included for the same reason.
   ##
   ## slot_origin_count counts SLOTS, not elements: a standalone `_aggr` over a
   ## static wildcard arrives as ONE slot already holding N paths, so the slot
-  ## value must be a single element too (slot_len).
-  ## That length test applies to FILE types only: there the slot value is the
-  ## character vector of paths, so its length IS the constituent count, while an
-  ## object slot holds the SERIALIZED payload, whose length is a byte count.
+  ## value must be a single element too (slot_len). That length test is for FILE
+  ## types only -- an object slot holds the SERIALIZED payload, whose length is
+  ## a byte count.
   ##
-  ## A file slot whose value still holds a "{{...}}" TEMPLATE is not a resolved
-  ## path: the wrapper resolves it by globbing its directory, and only for an
-  ## ATOMIC file_path parameter (inst/scripts/wrapper.R). Wrapping such a
-  ## slot hides it from that branch, the glob never runs, and the unresolved
-  ## template reaches the body, where the wrapper's guard stops it with
-  ## "input '<p>' was not resolved". Leave those atomic here; the wrapper turns
-  ## them into a list AFTER resolving them, so the gather still arrives as a list.
+  ## A file slot still holding a "{{...}}" TEMPLATE is left atomic: the wrapper
+  ## resolves it by globbing, and only for an ATOMIC file_path parameter
+  ## (inst/scripts/wrapper.R). Wrapping it hides it from that branch and the
+  ## unresolved template reaches the body, where the guard stops it with
+  ## "input '<p>' was not resolved". The wrapper makes the list after resolving.
   is_file_slot <- params_type %in% c("file", "file_path", "file_object")
   slot_len     <- vapply(par_list, length, integer(1))
   ## has_template is consulted ONLY for file slots (see add_wrap below): for any
@@ -433,13 +412,9 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
     params_type[add_wrap] <- paste0("wrapped:", params_type[add_wrap])
   }
 
-  ## The form the WRAPPER is told is the form of the container it must build
-  ## from the slots it receives, which is the declared one except
-  ## for a file slot still carrying a "{{...}}" TEMPLATE: the wrapper resolves
-  ## such a slot by globbing its directory, and only while the parameter is an
-  ## ATOMIC file_path (inst/scripts/wrapper.R). It then makes the list itself
-  ## from the "aggregation" class. Telling it "list" there would hide the slot
-  ## from that branch and the unresolved template would reach the body.
+  ## The form the WRAPPER is told is the declared one, except for a templated
+  ## file slot (see above): there it is told the atomic form and builds the list
+  ## itself, from the "aggregation" class, after globbing.
   .slot_par <- rep(seq_along(wrapped_count), wrapped_count)
   .globbed  <- is_file_slot & has_template
   if(any(.globbed))

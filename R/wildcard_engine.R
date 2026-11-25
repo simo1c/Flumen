@@ -89,8 +89,7 @@ is_recursive_wildcard <- function(pattern) {
 ## wildcard can possibly appear: every pattern above requires braces, which no
 ## number, logical or raw can produce once coerced.
 ##
-## Exists because `unlist()` COERCES: applied to a list holding one string and one
-## parameter payload it turns the whole payload into strings.
+## Exists because `unlist()` coerces, as grep() does above.
 ##
 ## Order is preserved among the character leaves, so callers that paste and then
 ## extract tags see the same tags in the same order; dropped leaves contribute

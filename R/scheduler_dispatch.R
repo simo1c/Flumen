@@ -196,11 +196,11 @@ execute_single_task <- function(exe_id, chosen_socket, workflow, exe_id_to_idx, 
         exp_names      <- c(exp_names, par_name)
       }
       ## A gather is a list by declaration; several producers are a list; one
-      ## producer is a list only when it resolves to more than one result, 
-      ## and a dependency pinned to ONE result
-      ## (output_instance set: the _exp form, one consumer instance per file,
-      ## or a static producer that returned a single value) resolves to that
-      ## result alone, whatever the output holds. A static producer whose one
+      ## producer is a list only when it resolves to more than one result. A
+      ## dependency pinned to ONE result (output_instance set: the _exp form,
+      ## one consumer instance per file, or a static producer that returned a
+      ## single value) resolves to that result alone, whatever the output
+      ## holds. A static producer whose one
       ## object output returned a list of several elements is bound to the
       ## whole result instead, as a dynamic one (R/scheduler_task_table.R).
       .one <- par_val[[1]]
@@ -313,11 +313,10 @@ execute_single_task <- function(exe_id, chosen_socket, workflow, exe_id_to_idx, 
   }
 
   ## Least-connections routing: reroute each output_req fetch to a least-loaded
-  ## peer holder, if one
-  ## holds (exe_id, out_instance); otherwise the request is left pointing at the
-  ## producer. Single site covers every emit path above
-  ## (output_req_list, single output_req, static-aggregation). The chosen source's
-  ## transport triple replaces the producer's, kept coherent from one supervisor_info row.
+  ## peer holder of (exe_id, out_instance), otherwise leave it pointing at the
+  ## producer. A single site covers every emit path above (output_req_list,
+  ## single output_req, static-aggregation). The chosen source's transport
+  ## triple replaces the producer's, kept coherent from one supervisor_info row.
   if (!is.null(sched_state) && !is.null(supervisor_info)) {
     for (i in seq_along(exp_values)) {
       if (identical(exp_msg_types[i], "parameter_request") &&
@@ -693,11 +692,9 @@ try_schedule <- function(sched_state, workflow, exe_id_to_idx,
     chosen_socket <- socket_list[[paste0("sock_ctrl_", chosen_worker_name)]]
 
     ## Mark input files as in_transit toward the chosen worker BEFORE the send.
-    ## Skipped for local workers (no chunked transfer path is taken anyway, since
-    ## execute_single_task downgrades dtype to "file_path" for them). Files that
-    ## are already in `completed[chosen_worker]` are NOT marked in_transit,
-    ## because execute_single_task below downgrades their dtype to file_path and
-    ## no transfer happens.
+    ## Skipped for a local worker, and for files already in
+    ## `completed[chosen_worker]`: in both cases execute_single_task downgrades
+    ## the dtype to "file_path" and no transfer happens.
     chosen_worker <- Find(function(w) w$name == chosen_worker_name, worker_list)
     if (!is.null(chosen_worker) && !is.null(chosen_worker$launcher)) {
       task_files <- get_task_input_file_paths(op, workflow$par_locations, workflow$shared_path)
