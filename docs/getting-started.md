@@ -662,7 +662,7 @@ declare yourself. When a file output under a declared root is consumed by a
 downstream task on another machine, the consumer reads it from the mount
 instead of receiving the bytes peer-to-peer. So the same pipeline moves
 between a set of machines with no shared storage, where outputs are transferred
-over sockets, and a cluster with an NFS or Lustre mount, where they are not, by
+over sockets, and a cluster with a shared mount, where they are not, by
 declaring the mount at launch. An output declared with `new_object()` is
 unaffected: an in-memory value is always transferred over the socket.
 

@@ -6,8 +6,8 @@
 ## A file under a declared shared_path root is read by the consumer from that
 ## root, with no byte transfer, so get_task_input_file_paths must not mark it
 ## in_transit: with no transfer there is no file_received to clear it and the
-## ghost is permanent. On a path shared by many tasks (an NFS/Lustre reference
-## genome) select_worker would then exclude that worker from EVERY later task
+## ghost is permanent. On a path shared by many tasks (a reference genome on a
+## shared mount) select_worker would then exclude that worker from EVERY later task
 ## needing it -> the worker starves.
 ##
 ## Root: flumen:::get_task_input_file_paths() feeds BOTH the in_transit marking and the

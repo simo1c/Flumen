@@ -1,7 +1,7 @@
 ## Feature: local workers can declare `resources` (incl. capability `tags`)
 ## directly via new_worker(resources=), so a task can be pinned to a LOCAL
 ## worker (e.g. a Mac master+worker). The launcher stays AUTHORITATIVE for
-## launched (remote/SLURM) workers -- its resources describe what is actually
+## launched (remote) workers -- its resources describe what is actually
 ## provisioned -- so resources come from the launcher when present, and from
 ## new_worker(resources=) only for local workers (no launcher). Declaring
 ## resources in BOTH places is an error (no silent precedence).

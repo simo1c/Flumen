@@ -1905,7 +1905,7 @@ One machine: `new_worker(name, n_concurrent_task)` with `launcher = NULL`, the d
 
 ### 10.4 Choosing whether to transfer a file
 
-A file on the master that must reach the worker is declared with `new_file(path)` and transferred, which is the default. A file already present on one worker is declared `pre_staged(new_file(path))`, and the master neither reads nor sends it. A mount visible to every worker is not a task-level decision at all: declare its root once with `run_workflow(shared_path = ...)` and every absolute path under it is read in place. See sections 3.2.3 and 3.5.
+A file on the master that must reach the worker is declared with `new_file(path)` and transferred, which is the default. A file already present on one worker is declared `pre_staged(new_file(path))`, and the master neither reads nor sends it. A mount visible to every worker is not a task-level decision at all: declare its root once with `run_workflow(shared_path = ...)` and every absolute path under it is read by the consumer from that root. See sections 3.2.3 and 3.5.
 
 ## 11. Quick FAQ for chatbots
 
