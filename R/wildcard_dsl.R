@@ -248,13 +248,10 @@ update_param_wildcard_with_value <- function(par_list,
   ## caller gives one: a path is "file_path" whatever its constituent count
   ## (a received "file" is on disk by now, hence the same label).
   ##
-  ## One label is NOT forwarded: the bare "wrapped" sentinel, which is decoded
-  ## here instead. It means the producer could not Arrow-encode this element,
-  ## so the bytes are qs2 and carry no type of their own, while "wrapped:raw",
-  ## one character apart, is the contract for the user's OWN bytes, which the
-  ## consumer must hand over undecoded. Passthrough buys nothing for the
-  ## sentinel anyway: a Python consumer is refused either way, and an R one
-  ## needs the qs2 decode regardless of who does it.
+  ## One label is NOT forwarded: the bare "wrapped" sentinel, decoded here
+  ## instead. It means the producer could not Arrow-encode, so the bytes are qs2
+  ## and carry no type; "wrapped:raw", one character apart, is the contract for
+  ## the user's OWN bytes, which the consumer must hand over undecoded.
   value <- lapply(seq_along(value), function(i){
     v_i <- value[[i]]
     ty  <- if (is.null(data_type) || i > length(data_type)) NA_character_

@@ -343,17 +343,13 @@ serialize_data <- function(data, data_type, to_arrow){
 
     if("raw" %in% class(data[[i]])){
       bin_data <- data[[i]]
-      ## Aggregated slots ("wrapped" sentinel) arrive already DECODED from
-      ## update_param_wildcard_with_value, so a raw element here is genuine
-      ## unencoded payload and the emitted type must say so -- otherwise the
-      ## receiver qs2-deserializes bytes that were never qs2-serialized.
-      ## Non-aggregated slots still carry ENCODED bytes (also class "raw"),
-      ## whose declared type must be preserved untouched.
-      ## ONLY the bare sentinel: a resolved "wrapped:<type>" already describes
-      ## the element (its bytes are encoded) and must be preserved.
-      ## "R_object" is the other label that is not a type: it is the MESSAGE tag
-      ## a literal slot carries when nothing encoded it, so the same rule
-      ## applies to it.
+      ## A bare "wrapped" or "R_object" label is a MESSAGE TAG, not a type.
+      ## Aggregated slots arrive already DECODED (update_param_wildcard_with_value),
+      ## so a raw element here is genuine unencoded payload and must be relabelled,
+      ## or the receiver qs2-deserializes bytes that were never qs2-serialized.
+      ## Only the BARE sentinel: a resolved "wrapped:<type>" already describes
+      ## encoded bytes, as does a non-aggregated slot's declared type, and both
+      ## are preserved.
       if(isTRUE(as.character(data_type[[i]])[1] == "wrapped")) data_type[i] <- "wrapped:raw"
       if(isTRUE(as.character(data_type[[i]])[1] == "R_object")) data_type[i] <- "raw"
       data_struct$data_struct <- c(data_struct$data_struct, list(data_type[i]))

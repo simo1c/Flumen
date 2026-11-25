@@ -167,41 +167,30 @@ if(length(param_to_remove)){
   par_list <- par_list[-param_to_remove]
 }
 
-## Strip flumen-internal classes from input parameters before handing them
-## to the user function. The constructors `new_object*` / `new_file*` attach
-## marker classes ("expansion", "aggregation", "partial_aggregation",
-## "object", "file_object", "file_path", "path") that are implementation
-## details of the dispatch/resolution pipeline. They sit in FRONT of the
-## declared type -- new_object_exp("{s}") is expansion/flumen_object/character
-## -- so anything that reads class(x)[1] or dispatches S3 on it sees a flumen
-## internal instead of the type the user declared. Removing the markers gives
-## back the bare R type (character, numeric, list, ...) without touching any
-## user-set classes (Seurat, data.frame, factor, ...).
-## Recursive: catches list-of-paths (multi-file _aggr+dep) whose outer list
-## is unclassed but whose inner character elements carry "file_path".
-## CRITICAL: recurse only into BARE lists (class == "list"); data.frames,
-## tibbles, data.tables, and other list-derived structures must NOT be
-## descended into -- `is.list(data.frame)` is TRUE, and a naive recursion
-## would walk through the columns and destroy the data.frame class.
-## The marker for a path is "flumen_path". The bare name "path" is listed
-## beside it because `grid` -- base R, attached by Matrix, ggplot2, lattice
-## and therefore by Seurat -- defines a class of that name with four S3
-## methods, print.path and as.character.path among them: a flumen path
-## carrying it reaches either with any of those loaded, dispatches into grid
-## and dies on "$ operator is invalid for atomic vectors". Both names are
-## stripped, so a producer sending either has its markers removed here.
+## Strip flumen's marker classes (FLUMEN_INTERNAL_CLASSES below) before handing
+## parameters to the user function: they sit in FRONT of the declared type --
+## new_object_exp("{s}") is expansion/flumen_object/character -- so class(x)[1]
+## and S3 dispatch see a flumen internal. User classes (Seurat, data.frame) stay.
+##
+## Recursion catches a list-of-paths (multi-file _aggr+dep) whose outer list is
+## unclassed but whose character elements carry "file_path". CRITICAL: recurse
+## only into BARE lists -- is.list(data.frame) is TRUE, so a naive recursion
+## would walk the columns and destroy the data.frame class.
+##
+## "path" is stripped beside "flumen_path" because grid -- base R, attached by
+## Matrix, ggplot2, lattice and therefore Seurat -- defines a class of that name:
+## a flumen path carrying it dispatches into print.path or as.character.path and
+## dies on "$ operator is invalid for atomic vectors".
 FLUMEN_INTERNAL_CLASSES <- c("expansion", "aggregation", "partial_aggregation",
                               "flumen_object", "object", "file_object", "file_path",
                               "flumen_path", "path")
 strip_flumen_classes <- function(x){
-  ## Step 1: strip flumen classes from x itself (top-level)
   cls <- class(x)
   keep <- setdiff(cls, FLUMEN_INTERNAL_CLASSES)
   if(!identical(keep, cls)){
     if(length(keep) == 0L) x <- unclass(x)
     else class(x) <- keep
   }
-  ## Step 2: recurse only if x is now a BARE list (no other classes)
   if(is.list(x) && identical(class(x), "list")){
     return(lapply(x, strip_flumen_classes))
   }
