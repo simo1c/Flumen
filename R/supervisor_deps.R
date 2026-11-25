@@ -429,14 +429,11 @@ get_result_from_msg <- function(msg){
         ## The producer's own name for THIS element (the names of a returned
         ## named list / dict), reattached downstream as list names or dict keys.
         elem_name = msg[[i]]$elem_name,
-        ## Which declared OUTPUT this result belongs to. Distinct from elem_name
-        ## in ROLE: elem_name is the producer's per-element name, reattached
-        ## downstream as a list name / dict key, while this names the output the
-        ## element came from and is what a consumer selects by.
-        ## elem_name must NOT feed this: for a DYNAMIC object output the names
-        ## of the returned list are the WILDCARD VALUES (list(a=,b=,c=) -> three
-        ## instances a/b/c), not the declared output's name. Empty when the
-        ## producer states none.
+        ## Which declared OUTPUT this result belongs to, and what a consumer
+        ## selects by. Distinct in ROLE from elem_name, the producer's
+        ## per-element name reattached downstream as a list name / dict key,
+        ## which must NOT feed this field (see out_object_par_names in
+        ## R/wrapper_lib.R). Empty when the producer states none.
         output_par_name = msg[[i]]$data_names
       )
 

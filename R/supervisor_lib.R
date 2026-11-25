@@ -9,9 +9,10 @@ FIXED_DISPATCH_FIELD_NAMES <- c("shell_interpreter", "user_code",
                                 "output_object_par_names",
                                 ## the FORM each parameter is delivered in
                                 ## ("bare", "list", "aggregate"), one entry per
-                                ## declared parameter in slot order, so the
-                                ## wrapper reads the container instead of
-                                ## counting same-named slots.
+                                ## declared parameter in order of first
+                                ## appearance among the slots, so a reader
+                                ## builds the container instead of counting
+                                ## same-named slots.
                                 "params_form")
 ## New fields go at the END: every wrapper reads the earlier ones by position
 ## (msg[[2]]..msg[[9]] in R, merged[1]..merged[8] in Python), so appending
@@ -249,9 +250,9 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
   use_arrow <- isTRUE(get_wrapper_info(reg_tasks_wrapper$exe_object$type)$use_arrow)
 
   ## The container a parameter is delivered in is DECLARED (params_form,
-  ## uuid-keyed, aligned with par_list by POSITION through par_uuids: the
-  ## resolvers rebuild params_type with c(start, value, end) and drop the
-  ## name of the slot they replace, so names are not reliable). A dependency
+  ## uuid-keyed, aligned with par_list by POSITION through par_uuids -- the
+  ## resolvers drop the name of the slot they replace, so names are not
+  ## reliable). A dependency
   ## parameter is a list of constituents, one per producer, each holding the
   ## elements that producer delivered; "aggregate" and "list" hand that list
   ## to the expansion below, which flattens it to one slot per element.
@@ -346,24 +347,19 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
 
   ## A single new_object dep resolves to a 1-constituent output_req_list, which
   ## the resolver marks "wrapped" exactly like a 1-element aggregation. The
-  ## marker is stripped for a single-element NON-aggregation param and the
-  ## wrapper delivers it bare; genuine gathers (params_is_aggr) keep the list
-  ## shape even at length 1. params_is_aggr is uuid-named and positionally
-  ## aligned with the un-expanded params_type, so it reps by wrapped_count like
-  ## the other per-param vectors above, and sub() preserves the per-element type
-  ## for decode, "wrapped:" being only the list marker (see serialize.R).
+  ## marker is stripped for a single-element NON-aggregation param and delivered
+  ## bare; genuine gathers (params_is_aggr) keep the list shape even at length 1.
   ##
   ## A slot that arrived as already-encoded bytes carries the label of whoever
   ## encoded it: the producing wrapper for an aggregation constituent, the
-  ## scheduler for a dispatched value. Render that label, do not recompute one.
-  ## params_type here comes from the exe_object and holds class(value)[1] of a
-  ## flumen-internal S3 class, so recomputing would say "object" or "expansion"
-  ## where the consumer expects "vector".
+  ## scheduler for a dispatched value. Render that label, do not recompute one:
+  ## params_type holds class(value)[1] of a flumen-internal S3 class, so
+  ## recomputing would say "object" or "expansion" where the consumer expects
+  ## "vector".
   ##
-  ## Placed before the strip / add_wrap block below on purpose: those rules
-  ## decide the CONTAINER (bare value vs list), orthogonal to the element type,
-  ## and act on the resolved "wrapped:<type>" like any other. The attributes are
-  ## removed here so they never reach the wire.
+  ## Placed before the strip / add_wrap block on purpose: those rules decide the
+  ## CONTAINER (bare value vs list), orthogonal to the element type. The
+  ## attributes are removed here so they never reach the wire.
   for(i in seq_along(par_list)){
     slot_val  <- par_list[[i]]
     slot_type <- attr(slot_val, "flumen_elem_type")
@@ -485,16 +481,14 @@ prepare_code_and_parameters_for_wrapper <- function(reg_tasks_wrapper,
                  "character", "character", "character", params_type)
   # The N_FIXED_DISPATCH_FIELDS fixed fields use use_arrow; parameters propagate
   # params_is_arrow, decoded as in the table above. A Python op is all TRUE.
-  ## A Python wrapper reads Arrow and nothing else. For use_arrow the to_arrow
-  ## line below flags every parameter as Arrow by INTENT, not by fact: a payload
-  ## that is already qs2 bytes stays qs2 (flumen never re-serialises) and travels
-  ## mislabelled, so the wrapper feeds qs2 to pa.ipc.open_stream and dies on
-  ## "Invalid IPC stream: negative continuation token". It happens for every type
-  ## is_arrow_compatible_type() rejects -- a sparse matrix, an S4 object, a
-  ## nested list, a complex vector.
-  ##
-  ## Refused here rather than converted: re-encoding would move the payload
-  ## through qs2 -> R -> Arrow inside the supervisor, which flumen does not do.
+  ## A Python wrapper reads Arrow and nothing else, and the to_arrow line below
+  ## flags every parameter as Arrow by INTENT: a payload that is already qs2
+  ## stays qs2 (flumen never re-serialises) and travels mislabelled, so the
+  ## wrapper feeds it to pa.ipc.open_stream and dies on "Invalid IPC stream:
+  ## negative continuation token" -- for every type is_arrow_compatible_type()
+  ## rejects (sparse matrix, S4, nested list, complex vector). Refused here
+  ## rather than converted: re-encoding would move the payload through
+  ## qs2 -> R -> Arrow inside the supervisor, which flumen does not do.
   ##
   ## THREE conditions, each load-bearing:
   ##   is.raw()             -- !params_is_arrow ALSO means "still a native R
@@ -673,10 +667,6 @@ get_param_info_from_exe_task_msg <- function(msg, consumer_uses_arrow = TRUE){
     ## are; the decode below is left for the payloads the scheduler could not
     ## encode (a type Arrow cannot carry), where it is what makes the re-encode,
     ## and the resulting error message, possible.
-    ##
-    ## The wire label rides along on the bytes: delivery must not recompute it
-    ## from params_type, which holds class(value)[1] of a flumen-internal S3
-    ## class ("object", "expansion", "file_object") and not a data type.
     .dt <- as.character(par$data_type)[1]
     must_understand <- isTRUE(par$msg_type == "parameter_request") ||
                        (!is.na(.dt) && grepl("file", .dt, fixed = TRUE))

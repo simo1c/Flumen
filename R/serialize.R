@@ -428,11 +428,9 @@ serialize_data <- function(data, data_type, to_arrow){
   return(serialized)
 }
 
-## `forms`: the declared FORM of every parameter ("bare", "list", "aggregate"),
-## one entry per declared parameter in the order of first appearance of each
-## name among the slots (the fixed dispatch field params_form). A parameter
-## whose form is "list" or "aggregate" is delivered as a list, "bare" as one
-## value. Required: the form is never recovered by counting slots.
+## `forms`: the fixed dispatch field params_form (defined in R/supervisor_lib.R).
+## "list" or "aggregate" is delivered as a list, "bare" as one value. Required:
+## the form is never recovered by counting slots.
 aggregate_params <- function(input_list, forms) {
 
   if (length(input_list) == 0) return(list())

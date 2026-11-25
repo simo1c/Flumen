@@ -309,33 +309,17 @@ if(!length(out_files) && is.null(out_dyn_par) && length(out_object_par_names) > 
 if(!length(out_files)){
   if("list" %in% class(result)){
     data <- result
-    ## A raw element travels VERBATIM, exactly as a bare raw result does.
-    ## qs2-serialising it here would expect the consumer to deserialise it
-    ## back, and the consumer does not: `raw` routes to the pass-through in
-    ## R/messaging.R (and to bytes() in objects.py), by contract, because raw
-    ## means "the user's bytes". Nobody undoes the wrapping, so the envelope
-    ## arrives as the payload: 5 bytes in, 73 out, silently, to R consumers as
-    ## much as to Python ones. Bare bytes cannot be mistaken for a qs2 payload
-    ## either, because per-element type restoration in supervisor_lib.R delivers
-    ## the type as `raw`, never as `wrapped`.
+    ## A raw element travels VERBATIM. The consumer's `raw` path is pass-through
+    ## (R/messaging.R, bytes() in objects.py) because raw means "the user's
+    ## bytes", so nothing would undo a wrapping here and the envelope would
+    ## arrive as the payload: 5 bytes in, 73 out, silently.
     types       <- sapply(data, flumen:::get_R_type)
     use_arrow_v <- sapply(types, flumen:::is_arrow_compatible_type)
-    ## "wrapped:X" preserves the "was a list" marker + the element's type.
-    ## The type is stated even when Arrow cannot carry it and the element
-    ## travels as qs2. An element whose type is UNNAMED is one nobody
-    ## downstream can forward: the consumer's supervisor would have to decode
-    ## it just to learn what it was, and encode it again. Naming the type costs
-    ## one string and lets the bytes travel untouched: an R consumer reads
-    ## is_arrow=FALSE and qs2-decodes them, and a Python consumer is still
-    ## refused by the guard in supervisor_lib.R, which has a type to judge only
-    ## because it was named here.
-    ##
-    ## The bare "wrapped" sentinel is never emitted. It sits one character from
-    ## "wrapped:raw", which means the opposite -- the user's OWN bytes, handed
-    ## over undecoded -- and collapsing the two delivers a qs2 envelope as if it
-    ## were the payload, silently. A `raw` element still
-    ## yields exactly "wrapped:raw" here, which is the type serialize_data
-    ## states for the sentinel, so the two agree.
+    ## "wrapped:X" carries the "was a list" marker and the element's type. The
+    ## type is named even when Arrow cannot carry it, so a downstream supervisor
+    ## can forward the bytes without decoding them to learn what they are. The
+    ## bare "wrapped" sentinel is never emitted here: a `raw` element yields
+    ## exactly "wrapped:raw", which is what serialize_data states for it.
     data_type   <- paste0("wrapped:", types)
   }else{
     data <- list(result)

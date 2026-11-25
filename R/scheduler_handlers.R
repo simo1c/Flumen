@@ -476,11 +476,9 @@ sched_handle_result <- function(msg, state, recv_socket){
   }
 
   state$task_table <- set_task_status(state$task_table, state$task_status_env, res_notify$exe_id, "finished")
-  ## Serve-release backstop: this consuming task finished, so every serve routed to
-  ## feed it
-  ## is definitively concluded (transfer/cache/colocal/coalesced alike) -> release them.
-  ## Guarantees serving_count can never leak permanently. Keyed by this exe_id only, so
-  ## sibling tasks still running on the same worker keep their in-flight serves counted.
+  ## Serve-release backstop (trigger 2, see mesh_release_by_exe_id): this task
+  ## finished, so every serve routed to feed it is concluded. Without it
+  ## serving_count could leak permanently.
   state$sched_state <- mesh_release_by_exe_id(state$sched_state, res_notify$exe_id)
 
   workflow_update <- process_result_notify_and_update_workflow(

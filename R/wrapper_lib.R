@@ -78,13 +78,11 @@ wrapper_prepare_outputs <- function(msg){
   ## keep_files mask below: masking a vector that is not parallel to out_files
   ## would shift it by however many file patterns the task declared.
   out_object_par_names <- decode_message_data(msg[[8]]$data, msg[[8]]$data_type, msg[[8]]$is_arrow)
-  ## The FORM each parameter is delivered in (msg[[9]]): "bare", "list" or
-  ## "aggregate", one entry per declared parameter in slot order. It is what
-  ## the scheduler declared from the user's declaration; the wrapper reads it to
-  ## build the parameter's container rather than counting same-named slots.
-  ## A message with fewer fixed fields than this build expects comes from a
-  ## supervisor of another build, and its parameter slots start where this
-  ## wrapper reads a fixed field. Stop, rather than read one thing for another.
+  ## msg[[9]] is params_form (defined in R/supervisor_lib.R), the container the
+  ## scheduler declared for each parameter. A message with fewer fixed fields
+  ## than this build expects comes from a supervisor of another build, and its
+  ## parameter slots start where this wrapper reads a fixed field. Stop, rather
+  ## than read one thing for another.
   if(length(msg) < N_FIXED_DISPATCH_FIELDS)
     stop(sprintf(paste("the dispatch message carries %d fixed field(s), expected %d.",
                        "Fix: reinstall the same flumen build everywhere."),
