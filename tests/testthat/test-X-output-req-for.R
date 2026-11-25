@@ -25,11 +25,10 @@ test_that("output_req_for returns the constituent of that producer and nothing e
   expect_null(flumen:::output_req_selectors(one, "E2")$file_sel)
 })
 
-## In-memory reproduction of the X2 / C04a shape: the co-local resolver is
-## handed a container whose OWN constituent for the producer carries the right
-## template, next to a sibling carrying another. Before the stage the sibling's
-## template was read and the delivery came out empty; now the delivery is
-## whole, and a template that excludes everything is refused.
+## The co-local resolver is handed a container whose OWN constituent for the
+## producer carries the right template, next to a sibling carrying another. It
+## must read its own, not the sibling's, or the delivery comes out empty. A
+## template that excludes everything is refused.
 co_local_fixture <- function(own_template) {
   cache <- flumen:::new_memory_cache(dir = file.path(tempdir(), paste0("cache_", basename(tempfile()))))
   files <- list("parts/s1_r1_1.txt", "parts/s1_r1_2.txt")

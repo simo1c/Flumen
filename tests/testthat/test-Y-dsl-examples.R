@@ -2,10 +2,8 @@
 ##
 ## That file exists so someone (or something) with no prior knowledge can write
 ## a workflow from it. Its failure mode is not being incomplete: it is being
-## WRONG, because a reader then writes a broken workflow with confidence. Over
-## one working session five statements in it turned out not to match the code --
-## section 6.10 twice, the Python arrival shapes, the list-return contract.
-## Every one of them would have been caught by building the snippet.
+## WRONG, because a reader then writes a broken workflow with confidence. Each
+## snippet here is built, which catches a statement that does not match the code.
 ##
 ## Nothing is executed: run_workflow() and preview_workflow() are stubbed, so a
 ## documentation check never spawns a worker.
@@ -27,7 +25,7 @@ dsl_blocks <- function(path) {
     if (grepl("^#", l)) sec <- trimws(gsub("^#+", "", l))
     ## Accept every fence spelling a markdown editor may leave behind:
     ## ```r  /  ``` r  /  ```{r}  — RStudio's visual editor rewrites the first
-    ## into the second on save, which silently emptied this whole group once.
+    ## into the second on save, which would silently empty this whole group.
     if (grepl("^\\s*```\\s*\\{?r\\b", l)) { cur <- character(0); st <- i; csec <- sec; next }
     if (!is.null(cur) && trimws(l) == "```") {
       out[[length(out) + 1L]] <- list(line = st, sec = csec,

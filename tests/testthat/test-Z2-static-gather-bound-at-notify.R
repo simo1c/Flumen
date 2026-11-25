@@ -63,9 +63,8 @@ test_that("a producer with several outputs gives its constituent a path selector
 })
 
 test_that("a DYNAMIC gather is left to the wildcard engine", {
-  ## Seen on the first build of 13b: the dynamic template was bound as a
-  ## static gather, and its placeholder constituent reached the supervisor
-  ## with exe_id NA (six contract cells and nine delivery tests).
+  ## A dynamic template bound as a static gather sends its placeholder
+  ## constituent to the supervisor with exe_id NA.
   wf <- list(task_list = list(mk_producer("P1", "parts/s1_{{n}}.txt"),
                               mk_consumer("parts/s1_{{n}}.txt", "parts/{s}_{{n}}.txt")))
   wf <- flumen:::bind_static_gather_constituents(wf, op_to_expand = 2L, finished_task = wf$task_list[[1]],

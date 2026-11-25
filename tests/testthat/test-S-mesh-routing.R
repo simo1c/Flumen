@@ -1,7 +1,7 @@
 ## Group S — least-connections source routing.
 ## At consumer dispatch the scheduler rewrites each output_req's transport triple to a
 ## least-loaded peer holder (if any holds the data), else leaves it pointing at the
-## producer (pre-mesh behaviour). These tests lock the selection policy, triple
+## producer. These tests lock the selection policy, triple
 ## coherence, self-avoidance, and the serving_count book-keeping. Pure in-process.
 
 mk_state <- function() list(
@@ -33,7 +33,7 @@ test_that("S2 — busy producer + idle holder -> rerouted to the holder (coheren
   out <- flumen:::mesh_reroute_output_req(mk_req(), "consumer", s, sup_info)
   expect_identical(out$socket, "tcp://h1:31000")            # least-loaded -> holder
   expect_true(out$uses_tcp)                                 # triple from h1's row
-  expect_null(out$is_local)                                # the flag is gone: source / fetch say where (stage 11)
+  expect_null(out$is_local)                                # source / fetch say where, not a flag
 })
 
 test_that("S3 — least-connections among multiple holders", {

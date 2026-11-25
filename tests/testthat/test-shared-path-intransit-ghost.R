@@ -3,13 +3,12 @@
 ## (see test-prestaged-intransit-starvation.R), for the shared-filesystem
 ## read-in-place mode.
 ##
-## Bug: a file under a declared shared_path root is read in place by the worker
-## (execute_single_task downgrades dtype to "file_path" -> no byte transfer),
-## yet the dispatch still marked it in_transit because get_task_input_file_paths
-## was shared_path-blind. No transfer -> no file_received -> permanent ghost.
-## When that path is shared by many tasks (e.g. an NFS/Lustre reference genome
-## used by every per-sample task), select_worker then excludes that worker from
-## EVERY later task that needs the same path -> the worker starves.
+## A file under a declared shared_path root is read by the consumer from that
+## root, with no byte transfer, so get_task_input_file_paths must not mark it
+## in_transit: with no transfer there is no file_received to clear it and the
+## ghost is permanent. On a path shared by many tasks (an NFS/Lustre reference
+## genome) select_worker would then exclude that worker from EVERY later task
+## needing it -> the worker starves.
 ##
 ## Root: flumen:::get_task_input_file_paths() feeds BOTH the in_transit marking and the
 ## select_worker exclusion filter; it must receive shared_path and skip params

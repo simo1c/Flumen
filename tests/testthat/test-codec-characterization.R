@@ -10,8 +10,7 @@
 ##      consumer relies on.
 ## A refactor that changes either is a regression this test will catch.
 ##
-## Pure-function, no workers, deterministic. Values captured 2026-07-11 against
-## the pre-refactor code.
+## Pure-function, no workers, deterministic.
 
 ## Production round-trip: choose the codec exactly as a producer would
 ## (flumen:::is_arrow_compatible_type(flumen:::get_R_type(v))), encode, then decode.

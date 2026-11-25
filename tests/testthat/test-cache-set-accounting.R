@@ -1,13 +1,9 @@
-## Regression (M-B): cache_set must reconcile a pre-existing key's size before
-## (re)inserting, so ram_used / disk_used do not drift upward on an overwrite.
-##
-## Bug: cache_set added the new size to ram_used/disk_used without subtracting
-## the old entry's size when the SAME key was set again (which the mesh does
-## when re-caching a re-received holder output). The counters inflated on every
-## repeat -> premature spill (RAM believed full while free) and, worse, a
-## SPURIOUS "Disk cache limit exceeded" stop that failed a run whose disk was
-## nearly empty. Fix: subtract the old size + drop the old copy (RAM entry and/or
-## disk file) at the top of cache_set.
+## cache_set must subtract a pre-existing key's size and drop its old copy (RAM
+## entry and/or disk file) before (re)inserting -- the mesh sets the same key
+## again when re-caching a re-received holder output. Otherwise ram_used /
+## disk_used drift upward on every overwrite, causing premature spill (RAM
+## believed full while free) and a spurious "Disk cache limit exceeded" stop on
+## a run whose disk is nearly empty.
 
 mk <- function(nbytes) {
   v <- list(list(result = as.raw(rep(1L, nbytes)), data_type = "R_object",
@@ -19,15 +15,15 @@ mk <- function(nbytes) {
 test_that("repeated cache_set on the same RAM key does not inflate ram_used", {
   cache <- flumen:::new_memory_cache(max_ram = 1e6, max_disk = 1e7, dir = tempfile("mbram_"))
   for (i in 1:3) flumen:::cache_set(cache, "k", mk(1000))
-  expect_equal(cache$state$ram_used, 1000)          # was 3000 before the fix
+  expect_equal(cache$state$ram_used, 1000)
   expect_equal(length(cache$state$ram), 1L)
   expect_false(is.null(flumen:::cache_get(cache, "k")))
 })
 
 test_that("repeated cache_set on the same DISK key does not raise a spurious limit error", {
   ## max_ram=1 forces everything to disk; the real content is one 1000B entry,
-  ## well under max_disk=2500. Before the fix the 3rd set inflated disk_used to
-  ## 3000 and threw "Disk cache limit exceeded".
+  ## well under max_disk=2500. Without reconciliation the 3rd set would inflate
+  ## disk_used to 3000 and throw "Disk cache limit exceeded".
   cache <- flumen:::new_memory_cache(max_ram = 1, max_disk = 2500, dir = tempfile("mbdisk_"))
   expect_error(for (i in 1:3) flumen:::cache_set(cache, "k", mk(1000)), NA)  # NA = no error
   expect_equal(cache$state$disk_used, 1000)

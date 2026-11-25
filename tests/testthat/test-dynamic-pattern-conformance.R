@@ -2,10 +2,10 @@
 ## component granularity, and the R matcher and its Python port must agree.
 ##
 ## A match against a path has exactly three degrees of freedom: where it may
-## START, where it must END, and what a token may ABSORB. Every defect of this
-## family so far was one of the three left free: grep() searched INSIDE the
-## name (head and tail free), and `(.*)` crossed '/' whatever the pattern
-## (absorb free). The rule pinned here, in extract_multiple_wildcard_values():
+## START, where it must END, and what a token may ABSORB. A defect of this family
+## is one of the three left free: a search INSIDE the name leaves head and tail
+## free, and `(.*)` crossing '/' leaves absorb free. The rule pinned here, in
+## extract_multiple_wildcard_values():
 ##   head   anchored at a component boundary, (?:^|/), so a relative pattern
 ##          still matches an absolute path but never mid-name;
 ##   tail   anchored at the absolute end, \z, not $;
@@ -14,7 +14,7 @@
 ##          so the matcher accepts exactly what the lister enumerates.
 ##
 ## The table below enumerates the forms, one per degree of freedom plus the
-## behaviours that must be PRESERVED. Forms 1, 2, 4 were reached end to end
+## behaviours that must be PRESERVED. Forms 1, 2, 4 are reachable end to end
 ## (accessory index delivered as the output; a sample claiming a sibling's
 ## file). Forms 3 and 9 cannot be reached end to end today, because a
 ## non-recursive lister never enumerates a sub-directory, so this table is the

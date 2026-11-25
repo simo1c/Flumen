@@ -1,9 +1,9 @@
 ## A wildcard value equal to the wildcard's own name ("cond" in
 ## cond = c("cond", "ctrl")), bare or in a pattern form, is the sentinel the
-## expansion engine reads as "aggregate over this wildcard". The instance bound
-## to it was wired to every parent instance, and B[cond] received A[ctrl]'s
-## result with exit 0. new_workflow() now refuses such a value
-## (R/validation.R, rule 5e); everything else is accepted as before.
+## expansion engine reads as "aggregate over this wildcard". Accepted, the
+## instance bound to it is wired to every parent instance and B[cond] receives
+## A[ctrl]'s result with exit 0, so new_workflow() refuses it
+## (R/validation.R, rule 5e).
 
 own_name_wf <- function(wl, wd = names(wl)[1]) {
   A <- new_R_task(

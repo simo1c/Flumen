@@ -1,12 +1,9 @@
 ## A plain input -- new_object()/new_file() without _exp, not a dependency --
 ## is a VECTOR BINDING: it receives all the values of a static wildcard the task
 ## does not expand (FLUMEN_DSL.md sec. 5.1, "1 instance, all values as vector").
-## The bare token "{sample}" always did. Text around the token ("id_{sample}",
-## "ref/{ref}.fa") was resolved by the DAG resolution instead, with the
-## semantics of a dependency: literal in a task with an _aggr dependency or a
-## by= group, one value per clone in a task cloned over its parents. It is now
-## resolved by the wildcard engine, the same way in every shape, one entry per
-## KEY of the wildcard (sec. 2).
+## This holds for the bare token "{sample}" and for text around it
+## ("id_{sample}", "ref/{ref}.fa") alike: both are resolved by the wildcard
+## engine, one entry per KEY of the wildcard, the same way in every shape.
 
 vb_values <- function(kind, vb, wl = new_wildcard_list(sample = c("s1", "s2"), ref = c("r1", "r2"))) {
   sc    <- new_script("f <- function(...) 1")

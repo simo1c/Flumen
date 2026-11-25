@@ -1,12 +1,12 @@
 ## Regression: a pre_staged() input shared across many tasks must NOT enter the
 ## in_transit machinery.
 ##
-## Bug: a remote worker's first dispatch marks the task's input files in_transit
-## (scheduler_dispatch.R). A pre_staged file is NEVER transferred, so no
-## file_received ever clears it -> permanent ghost. When that path is shared by
-## many tasks (e.g. a pre_staged reference genome used by every per-sample
-## `count`), select_worker then excludes that worker from EVERY later task that
-## needs the same path -> the worker starves (sits idle while ready tasks exist).
+## A remote worker's first dispatch marks the task's input files in_transit
+## (scheduler_dispatch.R), but a pre_staged file is NEVER transferred, so no
+## file_received would clear it and the ghost is permanent. On a path shared by
+## many tasks (a pre_staged reference genome used by every per-sample `count`)
+## select_worker would then exclude that worker from EVERY later task needing it
+## -> the worker starves while ready tasks exist.
 ##
 ## Root: flumen:::get_task_input_file_paths() feeds BOTH the in_transit marking and the
 ## select_worker exclusion filter; it must skip pre_staged params (those with

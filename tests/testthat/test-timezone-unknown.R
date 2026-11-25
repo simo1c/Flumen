@@ -1,8 +1,7 @@
 ## Sys.timezone() is NA on a host with TZ unset and no tzdata, a minimal Linux
-## container among them. The Arrow decoder compared each POSIXct column's zone
-## with it inside if(), which then failed with "missing value where TRUE/FALSE
-## needed" on every data.frame holding a time zone-aware column
-## (R/serialize.R, from_arrow_binary_to_R). An unknown local zone now matches
+## container among them. The Arrow decoder must not compare a POSIXct column's
+## zone with it inside if(), which fails with "missing value where TRUE/FALSE
+## needed" (R/serialize.R, from_arrow_binary_to_R). An unknown local zone matches
 ## nothing, so the column keeps the zone it arrived with.
 
 ## The decoder with Sys.timezone() answering NA, as on such a host.

@@ -1,7 +1,6 @@
 ## Group X — preview_workflow(), the static "dry run".
 ##
-## It is an exported function, 182 lines, and covr measured it at 0%: nothing
-## had ever executed it. It is also what a user runs BEFORE launching, to see
+## It is an exported function, and what a user runs BEFORE launching, to see
 ## what the pipeline will do -- so a break here lands on someone's first
 ## contact with flumen.
 ##

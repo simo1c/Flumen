@@ -1,11 +1,10 @@
 ## Regression: a partial-aggregation `by=` that names a wildcard NOT declared in
 ## new_wildcard_list() must be rejected at build time.
 ##
-## Bug: an unknown/typo `by=` was silently dropped by intersect() in
-## expand_with_partial_aggregation() (object_func.R) and the consumer collapsed
-## into a FULL aggregation with NO error and NO warning -- a silent wrong
-## grouping (e.g. `by="smaple"` merges all samples instead of grouping per
-## sample). validate_aggr_by_wildcards() now fails loudly at new_workflow().
+## validate_aggr_by_wildcards() enforces it. Unchecked, intersect() in
+## expand_with_partial_aggregation() (object_func.R) drops the unknown name and
+## the consumer collapses into a FULL aggregation with no error -- a silent wrong
+## grouping, e.g. `by="smaple"` merges all samples instead of grouping per sample.
 
 wl <- new_wildcard_list(a = c("a1", "a2"), b = c("b1", "b2"))
 

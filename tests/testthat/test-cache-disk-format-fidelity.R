@@ -1,15 +1,11 @@
 ## Regression: the result-cache disk-spill format must round-trip the SEMANTIC
 ## `is_arrow` flag and the per-element `elem_name` faithfully.
 ##
-## Bug (H-A / M-A): write_result_to_disk stored only one boolean
-## `is_raw = is.raw(result)` and read_result_from_disk reconstructed
-## `is_arrow = is_raw`, conflating two distinct flags. A non-Arrow R object
-## (S4 / list / Seurat) is qs2-serialized to RAW bytes (is_raw=TRUE) yet its
-## semantic is_arrow is FALSE -> on read is_arrow flipped FALSE->TRUE, so a
-## consumer decoded qs2 bytes as Arrow and crashed ("Invalid IPC stream").
-## Separately, `elem_name` was never persisted -> named multi-output served
-## without names after a spill. Root fix: persist is_arrow and elem_name as
-## their own fields, separate from is_raw.
+## `is_raw` and `is_arrow` are distinct: a non-Arrow R object (S4 / list / Seurat)
+## is qs2-serialized to RAW bytes (is_raw=TRUE) while its semantic is_arrow is
+## FALSE. Conflating them makes a consumer decode qs2 bytes as Arrow and crash
+## ("Invalid IPC stream"). Both flags and `elem_name` are persisted as their own
+## fields, so a named multi-output keeps its names across a spill.
 
 rt <- function(el) {
   tf <- tempfile(fileext = ".bin")
@@ -26,8 +22,8 @@ test_that("non-Arrow R object keeps is_arrow=FALSE and its elem_name after spill
                elem_name = "myout")
   back <- rt(el)
 
-  expect_false(back$is_arrow)                          # was TRUE before the fix
-  expect_identical(back$elem_name, "myout")            # was NULL before the fix
+  expect_false(back$is_arrow)
+  expect_identical(back$elem_name, "myout")
   expect_true(is.raw(back$result))
 
   ## and it decodes back to the ORIGINAL object via the correct (qs2) codec

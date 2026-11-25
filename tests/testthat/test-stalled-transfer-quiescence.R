@@ -1,9 +1,8 @@
 ## check_stalled_transfers() fails a peer-to-peer fetch when no NEW chunk has
-## arrived for FLUMEN_STALLED_TRANSFER_SECS (600 s by default). It measured that
-## time from the START of the fetch, so a healthy transfer that had been running
-## for 600 s in total was failed after a few quiet checks (about 10 s without a
-## new chunk), with "no data arrived ... for 600s" (R/supervisor_handlers.R).
-## It now measures from the last chunk that arrived.
+## arrived for FLUMEN_STALLED_TRANSFER_SECS (600 s by default), measured from the
+## last chunk that arrived. Measuring from the START of the fetch would fail a
+## healthy transfer running for 600 s in total after a few quiet checks
+## (R/supervisor_handlers.R).
 
 ## A supervisor state holding one fetch of parameter x from producer PROD.
 stalled_state <- function(started_ago, chunks = 0L, last_progress_ago = NULL) {

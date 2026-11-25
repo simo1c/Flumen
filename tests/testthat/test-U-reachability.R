@@ -53,8 +53,7 @@ test_that("the scheduler is never a probe source (no scheduler->worker edges)", 
 test_that("compute_probe_roster includes local workers (no Host) as probers", {
   ## supervisor_info: a LOCAL worker (mac: empty Host, NA data port) + 2 remotes.
   ## The local worker dials OUT to pull data, so it MUST probe the remotes' data
-  ## ports -- even though it exposes no inbound TCP endpoint of its own. This is
-  ## the edge (mac -> remote) the old roster silently skipped, causing the hang.
+  ## ports -- even though it exposes no inbound TCP endpoint of its own.
   si <- data.frame(
     Supervisor_ID = c("mac", "remote1", "remote2"),
     Host          = c("",    "10.0.0.1", "10.0.0.2"),

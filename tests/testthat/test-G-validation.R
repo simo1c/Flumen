@@ -71,8 +71,7 @@ test_that("G5 — more than one dynamic wildcard in a single parameter errors", 
 })
 
 test_that("G6 — bare-folder output path is rejected", {
-  ## Single-segment, no extension, no wildcard, no backtick — i.e. the
-  ## pattern that pre-removal would have used new_folder("output_dir").
+  ## Single-segment, no extension, no wildcard, no backtick — a bare folder path.
   task <- new_shell_task(
     task_id = "copy",
     new_input(reads = new_file("../data/{sample}.fastq")),

@@ -1,8 +1,8 @@
-## new_wildcard_list() assigned each wildcard with `wildcards[[name]] <- ...`,
-## which REPLACES an earlier wildcard of the same name, so its check for
-## duplicated names, made after the loop, never fired:
-## new_wildcard_list(s = c("a", "b"), s = "c") kept s = "c" alone, silently,
-## and the workflow ran on one sample instead of three (R/wildcard_dsl.R).
+## new_wildcard_list() must refuse a name declared twice. Assigning with
+## `wildcards[[name]] <- ...` REPLACES the earlier one, so a check made after the
+## loop never sees the duplicate: new_wildcard_list(s = c("a", "b"), s = "c")
+## would keep s = "c" alone, silently, and the workflow would run on one sample
+## instead of three (R/wildcard_dsl.R).
 
 test_that("a wildcard declared twice is refused, naming it, in every form", {
   expect_error(new_wildcard_list(s = c("a", "b"), s = "c"),

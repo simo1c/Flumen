@@ -1,12 +1,9 @@
 ## Group O — Supervisor result cache (RAM + disk-spill tiers).
-## Regression guard for the read-once disk-destruction bug (June 2026):
-## cache_get() unconditionally file.remove()d a disk-resident entry after
-## reading it. Entries that fit in RAM are re-promoted (the RAM copy survives),
-## but an entry LARGER than max_ram cannot be promoted -- so the first read
-## destroyed the only copy and the next co-local / P2P consumer got NULL
-## (crash on get_result_instance). Fixed by reclaiming the disk copy only when
-## the entry is promoted back to RAM; over-RAM entries keep their disk copy and
-## are reclaimed by cache_reset() at workflow end. Pure in-process unit tests.
+## cache_get() must reclaim an entry's disk copy only when the entry is promoted
+## back to RAM. An entry LARGER than max_ram cannot be promoted, so reclaiming it
+## on first read would leave no copy and the next co-local / P2P consumer would
+## get NULL. Over-RAM entries keep their disk copy until cache_reset() at
+## workflow end. Pure in-process unit tests.
 
 ## Minimal result_object holding one raw element of `n` bytes (cache_set sizes
 ## an entry by the length of its raw elements; non-raw results count as 0).
@@ -28,7 +25,7 @@ test_that("O1 — over-RAM entry survives repeated reads (the bug)", {
   r2 <- flumen:::cache_get(cache, "X")
   r3 <- flumen:::cache_get(cache, "X")
   expect_identical(r1[[1]]$result, v[[1]]$result)
-  expect_identical(r2[[1]]$result, v[[1]]$result)   # was NULL before the fix
+  expect_identical(r2[[1]]$result, v[[1]]$result)
   expect_identical(r3[[1]]$result, v[[1]]$result)
 })
 

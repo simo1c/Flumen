@@ -1,9 +1,7 @@
 ## Group N — Messaging: chunked transport.
-## Regression guard for the per-element chunking bug (May 2026): new_message()
-## bounded each element's payload by chunk_size but bundled all N elements of a
-## message into one wire message, so a multi-element message could reach
-## N * chunk_size on the wire (and break the K=2 in-flight RAM bound). Fixed by
-## dividing the budget across the elements (eff_chunk_size in new_message()).
+## new_message() must divide chunk_size across a message's elements
+## (eff_chunk_size), so a multi-element message stays within one chunk_size on
+## the wire and keeps the K=2 in-flight RAM bound.
 
 ## Build every wire chunk of a multi-element message, then decode + reassemble.
 ## Returns list(sizes = <wire message byte sizes>, merged = <reassembled elements>).
@@ -27,7 +25,7 @@ build_and_reassemble <- function(data, chunk_size){
 
 ## Header allowance: the atomic Arrow-IPC header is prepended whole to every
 ## wire message (~2-4 KB even for dozens of elements). 50 KB is a generous
-## ceiling for it, yet far below the old bug's N * chunk_size blow-up.
+## ceiling for it.
 HEADER_SLACK <- 50000
 
 test_that("N1 — a multi-element message stays bounded by chunk_size on the wire", {

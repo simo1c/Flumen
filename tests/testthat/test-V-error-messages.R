@@ -7,8 +7,7 @@
 ##       wildcard or worker -- so the reader knows where to look;
 ##   (3) the message carries an ACTIONABLE cue, not just a statement of fact.
 ##
-## This is a regression guard: the messages are currently good, and the point is
-## to keep them that way. Nothing here executes a workflow.
+## The point is to keep the messages that way. Nothing here executes a workflow.
 
 ## A message is actionable if it tells the reader what to do differently --
 ## either in words (an imperative) or by naming the construct that is the remedy.

@@ -27,9 +27,8 @@ test_that("the expansion engine keeps a one-constituent container as a container
   ## which delivers a non-expanded list of ONE element as that element (sec.
   ## 7.5 of the DSL). A dependency's container of one producer is not such a
   ## wrapping: unboxed, its output_req came out wearing the container's class
-  ## and every reader iterating the constituents met atomic fields
-  ## ("$ operator is invalid for atomic vectors", cells C06, C07, C09 of the
-  ## contract on the first build of stage 13a).
+  ## and every reader iterating the constituents would meet atomic fields
+  ## ("$ operator is invalid for atomic vectors").
   pv <- list(k = "s1", ones = flumen:::new_output_req_list(req("E1", "one/s1.txt", instance = 2L)))
   out <- flumen:::expand_parameters(pv, flumen::new_wildcard_list(s = c("s1")),
                                     par_expansion = c(k = FALSE, ones = FALSE),

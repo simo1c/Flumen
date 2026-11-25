@@ -1,5 +1,5 @@
 ## Group T2 — serving_count is an authoritative-set mirror that cannot
-## leak. Locks the three historical leak paths (per-sample/select, coalescing overwrite,
+## leak. Locks the three leak paths (per-sample/select, coalescing overwrite,
 ## no-transfer resolve) via the two release triggers, plus crash cleanup and the
 ## no-double-decrement guarantee. Pure in-process (mirrors test-S setup).
 
@@ -30,7 +30,7 @@ setup_h1 <- function() { s <- mk_state(); s$holders[["EXE9#2"]] <- "h1"; s }
 test_that("T2.1 — coalescing: N fetches (same worker+key, distinct tasks) each counted, not overwritten", {
   s <- setup_h1()
   route(s, "consumer", "cA"); route(s, "consumer", "cB"); route(s, "consumer", "cC")
-  expect_equal(cnt(s, "h1"), 3L)                       # was 1 under the overwrite bug
+  expect_equal(cnt(s, "h1"), 3L)
   expect_equal(length(ls(s$serving_pending)), 3L)      # three distinct pending entries
 })
 

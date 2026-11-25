@@ -1,11 +1,9 @@
 ## Group P — PAIR control channels (sock_ctrl / sock_term) + worker-side heartbeat.
-## The per-worker dispatch (sock_ctrl) and terminate (sock_term) channels were
-## converted from PUSH/PULL to PAIR (June 2026) so the WORKER -- the dialer on
-## every channel -- can also SEND on them (its keepalive heartbeat), restoring the
-## "dialer = sender" invariant that lets NNG detect a broken pipe and auto-reconnect.
-## These tests lock the transport-level mechanics the conversion relies on:
-## bidirectional integrity, the real flumen chunked-dispatch path over PAIR, the
-## dialer's auto-reconnect, and send_aio buffering of the handshake before connect.
+## Both channels are PAIR, so the WORKER -- the dialer on every channel -- can
+## also SEND on them (its keepalive heartbeat). That keeps the "dialer = sender"
+## invariant NNG needs to detect a broken pipe and auto-reconnect. These tests
+## lock bidirectional integrity, the chunked-dispatch path over PAIR, the dialer's
+## auto-reconnect, and send_aio buffering of the handshake before connect.
 ## Pure in-process (nanonext sockets + flumen internals); no subprocesses.
 
 drain_serial <- function(s, max = 1000L) {

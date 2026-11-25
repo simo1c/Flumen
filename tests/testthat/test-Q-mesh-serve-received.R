@@ -63,10 +63,9 @@ test_that("Q1 — full data path (serve->chunked transfer->receive->reconstruct)
 
   expect_identical(ri$result[[1]], b1)
   expect_identical(ri$result[[2]], b2)
-  ## "R_object" is a message tag, not a type: announcing it as the wire type
-  ## made the receiver pick the wrong decoder, so serialize_data() now emits
-  ## "raw" for bytes that are already encoded. The payload is unchanged, which
-  ## the qs_deserialize() check below still proves.
+  ## "R_object" is a message tag, not a type: serialize_data() emits "raw" for
+  ## bytes that are already encoded, so the receiver picks the right decoder.
+  ## The payload is unchanged, which the qs_deserialize() check below proves.
   expect_identical(as.character(ri$result_type), c("raw", "wrapped:double"))
   expect_identical(as.character(ri$result_elem_names), c("elemA", "elemB"))
   expect_identical(qs2::qs_deserialize(ri$result[[1]]), data.frame(x = 1:5))
